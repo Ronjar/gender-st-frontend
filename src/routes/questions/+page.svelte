@@ -59,12 +59,23 @@
         currentQuestionIndex.update((n) => n + 1);
     };
 
-    const getCurrentQuestionImage = () => {
-        return `/img/questions/q-${get(currentQuestionIndex)}.png`;
-    };
+    let questionImage = "/img/questions/q-0.png";
+    currentQuestionIndex.subscribe((index) => {
+        if(index >= totalQuestions){
+            goto("/posttest");
+        }
+        questionImage = `/img/questions/q-${index}.png`;
+    });
 
     const leaderboard = derived(score, ($score) => {
-        const players = [...opponents, { profilePic: "/img/avatar/avatar1.png", score: $score, isYou: true }];
+        const players = [
+            ...opponents,
+            {
+                profilePic: "/img/avatar/avatar1.png",
+                score: $score,
+                isYou: true,
+            },
+        ];
         return players.sort((a, b) => b.score - a.score);
     });
 
@@ -72,12 +83,10 @@
     leaderboard.subscribe((value: any) => {
         sortedLeaderboard = value;
     });
-
-    $: questionImage = getCurrentQuestionImage();
-
+/*
     $: if (get(currentQuestionIndex) >= totalQuestions) {
         goto("/posttest");
-    }
+    }*/
 </script>
 
 <div class="flex justify-between">
