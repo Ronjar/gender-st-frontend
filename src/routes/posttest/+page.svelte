@@ -46,7 +46,7 @@
       // Store the answers in localStorage to be used later
       //localStorage.setItem("pretestAnswers", JSON.stringify(answers));
       posttestAnswers.set(answers)
-      goto("/questions"); // Navigate to the questions page
+      goto("/submission"); // Navigate to the questions page
     } catch (error) {
       errorMessage = "An error occurred. Please try again.";
     } finally { 

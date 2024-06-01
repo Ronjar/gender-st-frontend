@@ -15,7 +15,7 @@
   }
 </script>
 
-<div class="toast fixed bottom-0 right-0 w-1/4 flex justify-center">
+<div class="toast fixed top-0 left-1/4 w-1/2">
   {#if visible}
     <div
       class="alert alert-error shadow-lg"
