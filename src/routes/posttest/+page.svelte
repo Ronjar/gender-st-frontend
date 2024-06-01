@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { pretestAnswers } from "../../store";
+  import { posttestAnswers } from "../../store";
   import { goto } from "$app/navigation";
   import Toast from "./Toast.svelte";
 
@@ -37,24 +37,26 @@
 
     if (answers.includes(-1)) {
       toastRef.showToast();
+      //errorMessage = 'Please answer all the questions.';
       return;
     }
 
     loading = true;
     try {
       // Store the answers in localStorage to be used later
-      pretestAnswers.set(answers)
+      //localStorage.setItem("pretestAnswers", JSON.stringify(answers));
+      posttestAnswers.set(answers)
       goto("/questions"); // Navigate to the questions page
     } catch (error) {
       errorMessage = "An error occurred. Please try again.";
-    } finally {
+    } finally { 
       loading = false;
     }
   };
 </script>
 
 <div class="p-6 max-w-4xl mx-auto bg-base-200 rounded-xl shadow-md space-y-4">
-  <h1 class="text-2xl font-bold mb-6">Pretest</h1>
+  <h1 class="text-2xl font-bold mb-6">Posttest</h1>
   <form on:submit={handleSubmit} class="space-y-6 w-full max-w-4xl">
     {#if errorMessage}
       <div class="alert alert-error">

@@ -3,6 +3,7 @@
     import { goto } from "$app/navigation";
     import { get } from "svelte/store";
     import { derived } from "svelte/store";
+    import { questions } from "../../store";
     import Toast from "$lib/components/Toast.svelte";
 
     const totalQuestions = 20;
@@ -62,6 +63,7 @@
     let questionImage = "/img/questions/q-0.png";
     currentQuestionIndex.subscribe((index) => {
         if(index >= totalQuestions){
+            questions.set(get(userAnswers));
             goto("/posttest");
         }
         questionImage = `/img/questions/q-${index}.png`;
