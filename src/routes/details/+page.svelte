@@ -1,6 +1,7 @@
 <script lang="ts">
+    import {gamifiedElements, userId} from '../../store'
     import { goto } from '$app/navigation';
-    import { onMount } from 'svelte';
+    import { get } from 'svelte/store';
   
     let gender = '';
     let age = '';
@@ -166,7 +167,7 @@
   
       loading = true;
       try {
-        const response = await fetch('https://your-api-endpoint.com/adduser', {
+        const response = await fetch('http://localhost:6969/adduser', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -175,19 +176,21 @@
         });
   
         const data = await response.json();
+        console.log(data);
   
         if (response.ok) {
           // Assuming the server returns an ID in the format { id: 'unique-identifier' }
-          localStorage.setItem('userId', data.id);
-          localStorage.setItem('gamifiedElements', data.gamifiedElements);
+          gamifiedElements.set(data.gamifiedElements);
+          userId.set(data.userId);
+          console.log("userId: " + get(userId));
           goto('/pretest');
         } else {
           errorMessage = data.message || 'An error occurred. Please try again.';
         }
+        loading = false;
       } catch (error) {
         errorMessage = 'An error occurred. Please try again.';
       } finally {
-        loading = false;
       }
     };
   </script>

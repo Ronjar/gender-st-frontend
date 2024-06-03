@@ -1,6 +1,5 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
-  import { onMount } from "svelte";
   export let visible = false;
 
   const dispatch = createEventDispatcher();
@@ -15,7 +14,7 @@
   }
 </script>
 
-<div class="toast fixed top-0 left-1/4 w-1/2">
+<div class="toast fixed top-0 left-1/4 w-1/2 h-10">
   {#if visible}
     <div
       class="alert alert-error shadow-lg"
@@ -26,16 +25,3 @@
     </div>
   {/if}
 </div>
-
-<style>
-  .toast {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    padding: 1rem;
-    border-radius: 0.5rem;
-  }
-  .toast.show {
-    display: block;
-  }
-</style>

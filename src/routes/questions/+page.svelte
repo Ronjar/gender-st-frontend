@@ -1,9 +1,7 @@
 <script lang="ts">
-    import { writable } from "svelte/store";
+    import { writable, get, derived } from "svelte/store";
     import { goto } from "$app/navigation";
-    import { get } from "svelte/store";
-    import { derived } from "svelte/store";
-    import { questions } from "../../store";
+    import { questions, isAvatarEnabled, arePointsEnabled, isLeaderboardEnabled, isNarratedContentEnabled, areBadgesEnabled} from "../../store";
     import Toast from "$lib/components/Toast.svelte";
 
     const totalQuestions = 20;
@@ -11,6 +9,29 @@
     let score = writable(0);
     let userAnswers = writable<string[]>([]);
     let toastRef: Toast;
+
+    let varIsAvatarEnabled = false;
+    let varArePointsEnabled = false;
+    let varIsLeaderboardEnabled = false;
+    let varIsNarratedContentEnabled = false;
+    let varAreBadgesEnabled = false;
+
+    isAvatarEnabled.subscribe((value) => {
+        varIsAvatarEnabled = value;
+    });
+    arePointsEnabled.subscribe((value) => {
+        varArePointsEnabled = value;
+    });
+    isLeaderboardEnabled.subscribe((value) => {
+        varIsLeaderboardEnabled = value;
+    });
+    isNarratedContentEnabled.subscribe((value) => {
+        varIsNarratedContentEnabled = value;
+    });
+    areBadgesEnabled.subscribe((value) => {
+        varAreBadgesEnabled = value;
+    });
+
     let correctAnswers = [
         "B",
         "E",
@@ -94,12 +115,13 @@
 <div class="flex justify-between">
     <!-- Scoreboard -->
     <div class="w-1/4 mx-auto">
+        {#if varIsLeaderboardEnabled}
         <table class="table w-full bg-base-200 shadow-md rounded-xl table-auto">
             <thead class="my-10">
                 <tr class="my-10">
                     <th class="w-1/4">Rank</th>
                     <th class="w-1/4">Profile</th>
-                    <th class="w-2/4 text-center">Score</th>
+                    {#if varArePointsEnabled}<th class="w-2/4 text-center">Score</th>{/if}
                 </tr>
             </thead>
             <tbody>
@@ -113,11 +135,12 @@
                                 class="w-20 h-20 rounded-full"
                             />
                         </td>
-                        <td class="text-center text-lg">{player.score}</td>
+                        {#if varArePointsEnabled}<td class="text-center text-lg">{player.score}</td>{/if}
                     </tr>
                 {/each}
             </tbody>
         </table>
+        {/if}
     </div>
     <!-- Question Board -->
     <div class="p-6 w-1/2 mx-10 bg-base-200 rounded-xl shadow-md">
@@ -157,12 +180,14 @@
     </div>
     <!-- Scores and Badges -->
     <div class="w-1/4 mx-auto flex flex-col">
+        {#if varArePointsEnabled}
         <div class="w-1/2 stat bg-base-200 mb-10 p-4 rounded-xl shadow-md">
             <div class="stat-title">Score</div>
             <div class="stat-value text-primary">{$score}</div>
             <div class="stat-desc">5 points per question</div>
         </div>
-
+        {/if}
+        {#if varAreBadgesEnabled}
         <div class="w-1/2 bg-base-200 p-4 rounded-xl shadow-md">
             <div class="stat-title mb-5">Badges</div>
             <div class="stack">
@@ -183,5 +208,6 @@
                 </div>
             </div>
         </div>
+        {/if}
     </div>
 </div>
