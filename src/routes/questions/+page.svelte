@@ -1,7 +1,7 @@
 <script lang="ts">
     import { writable, get, derived } from "svelte/store";
     import { goto } from "$app/navigation";
-    import { questions, isAvatarEnabled, arePointsEnabled, isLeaderboardEnabled, isNarratedContentEnabled, areBadgesEnabled} from "../../store";
+    import { questions, isAvatarEnabled, arePointsEnabled, isLeaderboardEnabled, isNarratedContentEnabled, areBadgesEnabled, avatarPath} from "../../store";
     import Toast from "$lib/components/Toast.svelte";
 
     const totalQuestions = 20;
@@ -94,7 +94,7 @@
         const players = [
             ...opponents,
             {
-                profilePic: "/img/avatar/avatar1.png",
+                profilePic: get(avatarPath),
                 score: $score,
                 isYou: true,
             },

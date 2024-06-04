@@ -9,6 +9,9 @@ export const round = writable<number>();
 export const userId = writable<number>();
 
 
+export const avatarPath = writable<string>("");
+
+
 
 export const arePointsEnabled = derived(gamifiedElements, ($gamifiedElements: string) => {
     return $gamifiedElements.includes('p');

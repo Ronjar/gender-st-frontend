@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { pretestAnswers } from "../../store";
+  import { pretestAnswers, isAvatarEnabled } from "../../store";
   import { goto } from "$app/navigation";
   import Toast from "./Toast.svelte";
 
@@ -43,8 +43,12 @@
     loading = true;
     try {
       // Store the answers in localStorage to be used later
-      pretestAnswers.set(answers)
-      goto("/questions"); // Navigate to the questions page
+      pretestAnswers.set(answers);
+      if (isAvatarEnabled) {
+        goto("/avatars");
+      } else {
+        goto("/questions"); // Navigate to the questions page
+      }
     } catch (error) {
       errorMessage = "An error occurred. Please try again.";
     } finally {
@@ -141,7 +145,7 @@
         {/if}
       </button>
     </div>
-<!--
+    <!--
     {#if errorMessage}
       <div class="alert alert-error">
         <div class="flex-1">

@@ -1,9 +1,16 @@
 <script>
     import "../app.css";
-    import { isAvatarEnabled } from "../store";
+    import { isAvatarEnabled, avatarPath as storeAvatarPath } from "../store";
+    import { get } from "svelte/store";
+
+
     let avatarEnabled = false;
+    let avatarPath = "";
     isAvatarEnabled.subscribe((value) => {
         avatarEnabled = value;
+    });
+    storeAvatarPath.subscribe((value) => {
+        avatarPath = value;
     });
 </script>
 
@@ -12,16 +19,17 @@
     <header>
         <div class="navbar bg-base-100">
             <div class="flex-1">
-                <img src="/img/uni_logo.png" class="h-20 m-2" />
+                <img src="/img/uni_logo.png" class="h-20 m-2" alt="Icon of the University of Stuttgart"/>
             </div>
             {#if avatarEnabled}
                 <div class="flex-none">
                     <div class="avatar">
                         <div class="w-20 m-2 rounded-full">
+                            {#if avatarPath}
                             <img
-                                src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg"
-                                alt="User Avatar"
+                                src={avatarPath}
                             />
+                            {/if}
                         </div>
                     </div>
                 </div>
