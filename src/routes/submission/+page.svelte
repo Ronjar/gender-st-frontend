@@ -1,11 +1,15 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { pretestAnswers, questions, posttestAnswers } from "../../store";
+  import { pretestAnswers, questions, posttestAnswers, round as waRound} from "../../store";
   import { get } from "svelte/store";
   import { goto } from "$app/navigation";
 
   let loading = false;
   let apiResponse: string;
+  let round: number;
+  waRound.subscribe((value) => {
+        round = value;
+    });
 
   onMount(async () => {
     const pretest = get(pretestAnswers);
@@ -37,6 +41,14 @@
     }
   });
 
+  function getTitle(){
+    if(round < 3){
+      return "End of study part " + round
+    } else {
+      "End of study"
+    }
+  }
+
   const finishSurvey = async () => {
     if (apiResponse == "finished") {
     } else {
@@ -51,8 +63,17 @@
   };
 </script>
 
+<div class="p-6 max-w-4xl mx-auto bg-base-200 rounded-xl shadow-md space-y-4">
+  <h1>{getTitle()}</h1>
+  <p>Results are submitted any moment.</p>
+  <button
+    class="button {loading ? 'loading' : ''}"
+    on:click={finishSurvey}
+    disabled={loading}
+  >
+</div>
+
 <div>
-  <h1>Umfrage des Studienteils</h1>
   <p>Vielen Dank, dass Sie an unserer Umfrage teilgenommen haben!</p>
   <button
     class="button {loading ? 'loading' : ''}"
