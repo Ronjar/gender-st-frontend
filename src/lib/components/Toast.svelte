@@ -20,7 +20,7 @@
   }
 </script>
 
-<div class="mt-5 mx-auto ">
+<div class="mt-5 mx-auto">
   {#if visible}
     <div
       class={`alert ${type === "success" ? "alert-success" : "alert-error"} shadow-lg`}

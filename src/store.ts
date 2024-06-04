@@ -5,7 +5,7 @@ export const questions = writable<string[]>([]);
 export const posttestAnswers = writable<number[]>([]);
 
 export const gamifiedElements = writable<string>("");
-export const round = writable<number>();
+export const round = writable<number>(1);
 export const userId = writable<number>();
 
 
