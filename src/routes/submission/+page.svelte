@@ -1,26 +1,31 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import {
-    pretestAnswers,
-    questions,
-    posttestAnswers,
+    pretestAnswers as waPretestAnswers,
+    questions as waQuestions,
+    posttestAnswers  as waPosttestAnswers,
     round as waRound,
+    gamifiedElements as waGamifiedElements,
+    userId as waUserId
+
   } from "../../store";
   import { get, writable } from "svelte/store";
   import { goto } from "$app/navigation";
 
   let loading = false;
   let apiResponse: number;
-  let buttonVisiblility = writable<boolean>(false);
+  let buttonVisiblility = false;
   let round: number;
   waRound.subscribe((value) => {
     round = value;
   });
 
   onMount(async () => {
-    const pretest = get(pretestAnswers);
-    const questionList = get(questions);
-    const posttest = get(posttestAnswers);
+    const userId = get(waUserId)
+    const pretest = get(waPretestAnswers);
+    const questionList = get(waQuestions);
+    const posttest = get(waPosttestAnswers);
+    const gamifiedElements = get(waGamifiedElements);
 
     try {
       const response = await fetch("http://localhost:6969/addset", {
@@ -29,9 +34,11 @@
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          userId: userId,
+          gamifiedElements: gamifiedElements,
           pretestAnswers: pretest,
           questions: questionList,
-          posttestAnswers: posttest,
+          posttestAnswers: posttest
         }),
       });
 
@@ -40,10 +47,10 @@
       }
 
       const data = await response.json();
-      apiResponse = data.nextPage;
-    waRound.set(apiResponse);
-      if (apiResponse > 0) {
-        buttonVisiblility.set(true);
+      waRound.set(data.round);
+      waGamifiedElements.set(data.gamifiedElements);
+      if (data.round > 0) {
+        buttonVisiblility = true;
       }
     } catch (error) {
       console.error("Error uploading data:", error);
@@ -60,7 +67,7 @@
   }
 
   const finishSurvey = async () => {
-    goto("pretest")
+    goto("pretest");
   };
 </script>
 

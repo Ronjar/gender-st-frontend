@@ -1,13 +1,21 @@
 <script lang="ts">
     import { writable, get, derived } from "svelte/store";
     import { goto } from "$app/navigation";
-    import { questions, isAvatarEnabled, arePointsEnabled, isLeaderboardEnabled, isNarratedContentEnabled, areBadgesEnabled, avatarPath} from "../../store";
+    import {
+        questions,
+        isAvatarEnabled,
+        arePointsEnabled,
+        isLeaderboardEnabled,
+        isNarratedContentEnabled,
+        areBadgesEnabled,
+        avatarPath,
+    } from "../../store";
     import Toast from "$lib/components/Toast.svelte";
 
     const totalQuestions = 20;
     let currentQuestionIndex = writable(0);
     let score = writable(0);
-    let userAnswers = writable<string[]>([]);
+    let userAnswers = writable<boolean[]>([]);
     let toastRef: Toast;
 
     let varIsAvatarEnabled = false;
@@ -70,11 +78,12 @@
 
     const handleAnswer = (answer: string) => {
         // Antworten speichern
-        userAnswers.update((answers) => [...answers, answer]);
         if (correctAnswers[get(currentQuestionIndex)] === answer) {
             score.update((n) => n + 5);
+            userAnswers.update((answers) => [...answers, true]);
             showToast(true);
         } else {
+            userAnswers.update((answers) => [...answers, false]);
             showToast(false);
         }
         console.log(get(currentQuestionIndex));
@@ -83,7 +92,7 @@
 
     let questionImage = "/img/questions/q-0.png";
     currentQuestionIndex.subscribe((index) => {
-        if(index >= totalQuestions){
+        if (index >= totalQuestions) {
             questions.set(get(userAnswers));
             goto("/posttest");
         }
@@ -106,7 +115,7 @@
     leaderboard.subscribe((value: any) => {
         sortedLeaderboard = value;
     });
-/*
+    /*
     $: if (get(currentQuestionIndex) >= totalQuestions) {
         goto("/posttest");
     }*/
@@ -116,30 +125,39 @@
     <!-- Scoreboard -->
     <div class="w-1/4 mx-auto">
         {#if varIsLeaderboardEnabled}
-        <table class="table w-full bg-base-200 shadow-md rounded-xl table-auto">
-            <thead class="my-10">
-                <tr class="my-10">
-                    <th class="w-1/4">Rank</th>
-                    <th class="w-1/4">Profile</th>
-                    {#if varArePointsEnabled}<th class="w-2/4 text-center">Score</th>{/if}
-                </tr>
-            </thead>
-            <tbody>
-                {#each sortedLeaderboard as player, index}
-                    <tr class={player.isYou ? "bg-gray-800" : "bg-base-200"}>
-                        <td class="text-center text-lg">{index + 1}</td>
-                        <td class="flex justify-center items-center">
-                            <img
-                                src={player.profilePic}
-                                alt="profile"
-                                class="w-20 h-20 rounded-full"
-                            />
-                        </td>
-                        {#if varArePointsEnabled}<td class="text-center text-lg">{player.score}</td>{/if}
+            <table
+                class="table w-full bg-base-200 shadow-md rounded-xl table-auto"
+            >
+                <thead class="my-10">
+                    <tr class="my-10">
+                        <th class="w-1/4">Rank</th>
+                        <th class="w-1/4">Profile</th>
+                        {#if varArePointsEnabled}<th class="w-2/4 text-center"
+                                >Score</th
+                            >{/if}
                     </tr>
-                {/each}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {#each sortedLeaderboard as player, index}
+                        <tr
+                            class={player.isYou ? "bg-gray-800" : "bg-base-200"}
+                        >
+                            <td class="text-center text-lg">{index + 1}</td>
+                            <td class="flex justify-center items-center">
+                                <img
+                                    src={player.profilePic}
+                                    alt="profile"
+                                    class="w-20 h-20 rounded-full"
+                                />
+                            </td>
+                            {#if varArePointsEnabled}<td
+                                    class="text-center text-lg"
+                                    >{player.score}</td
+                                >{/if}
+                        </tr>
+                    {/each}
+                </tbody>
+            </table>
         {/if}
     </div>
     <!-- Question Board -->
@@ -181,33 +199,33 @@
     <!-- Scores and Badges -->
     <div class="w-1/4 mx-auto flex flex-col">
         {#if varArePointsEnabled}
-        <div class="w-1/2 stat bg-base-200 mb-10 p-4 rounded-xl shadow-md">
-            <div class="stat-title">Score</div>
-            <div class="stat-value text-primary">{$score}</div>
-            <div class="stat-desc">5 points per question</div>
-        </div>
+            <div class="w-1/2 stat bg-base-200 mb-10 p-4 rounded-xl shadow-md">
+                <div class="stat-title">Score</div>
+                <div class="stat-value text-primary">{$score}</div>
+                <div class="stat-desc">5 points per question</div>
+            </div>
         {/if}
         {#if varAreBadgesEnabled}
-        <div class="w-1/2 bg-base-200 p-4 rounded-xl shadow-md">
-            <div class="stat-title mb-5">Badges</div>
-            <div class="stack">
-                <div
-                    class="grid w-32 h-20 rounded bg-primary text-primary-content place-content-center"
-                >
-                    1
-                </div>
-                <div
-                    class="grid w-32 h-20 rounded bg-accent text-accent-content place-content-center"
-                >
-                    2
-                </div>
-                <div
-                    class="grid w-32 h-20 rounded bg-secondary text-secondary-content place-content-center"
-                >
-                    3
+            <div class="w-1/2 bg-base-200 p-4 rounded-xl shadow-md">
+                <div class="stat-title mb-5">Badges</div>
+                <div class="stack">
+                    <div
+                        class="grid w-32 h-20 rounded bg-primary text-primary-content place-content-center"
+                    >
+                        1
+                    </div>
+                    <div
+                        class="grid w-32 h-20 rounded bg-accent text-accent-content place-content-center"
+                    >
+                        2
+                    </div>
+                    <div
+                        class="grid w-32 h-20 rounded bg-secondary text-secondary-content place-content-center"
+                    >
+                        3
+                    </div>
                 </div>
             </div>
-        </div>
         {/if}
     </div>
 </div>

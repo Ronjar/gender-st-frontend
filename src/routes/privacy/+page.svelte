@@ -7,7 +7,7 @@ import { goto } from '$app/navigation';
 </script>
 
 <div class="p-6 max-w-4xl mx-auto bg-base-200 rounded-xl shadow-md space-y-4">
-  <h1>Terms of concent</h1>
+  <h1>Terms of consent</h1>
   <p>
     You can contact our data protection officer via <a
       href="mailto:datenschutz@uni-stuttgart.de">datenschutz@uni-stuttgart.de</a

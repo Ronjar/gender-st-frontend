@@ -1,12 +1,12 @@
 import { derived, get, writable } from 'svelte/store';
 
 export const pretestAnswers = writable<number[]>([]);
-export const questions = writable<string[]>([]);
+export const questions = writable<boolean[]>([]);
 export const posttestAnswers = writable<number[]>([]);
 
 export const gamifiedElements = writable<string>("");
 export const round = writable<number>(1);
-export const userId = writable<number>();
+export const userId = writable<number>(-1);
 
 
 export const avatarPath = writable<string>("");

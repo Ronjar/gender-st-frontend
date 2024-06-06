@@ -139,7 +139,7 @@
           <span class="loading loading-spinner"></span>
         {/if}
         {#if !loading}
-          Proceed to Questions
+          Proceed to Form Submission
         {/if}
       </button>
     </div>
