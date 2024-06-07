@@ -17,7 +17,7 @@ export const arePointsEnabled = derived(gamifiedElements, ($gamifiedElements: st
     return $gamifiedElements.includes('p');
 });
 export const areBadgesEnabled = derived(gamifiedElements, ($gamifiedElements: string) => {
-    return $gamifiedElements.includes('b');
+    return true; //return $gamifiedElements.includes('b');
 });
 export const isLeaderboardEnabled = derived(gamifiedElements, ($gamifiedElements: string) => {
     return $gamifiedElements.includes('l');

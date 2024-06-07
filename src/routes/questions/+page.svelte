@@ -11,12 +11,19 @@
         avatarPath,
     } from "../../store";
     import Toast from "$lib/components/Toast.svelte";
+    import NarratedContent from "$lib/components/NarratedContent.svelte";
+    import {
+        callWithProbability,
+        randomBadPhrase,
+        randomGoodPhrase,
+    } from "$lib/scripts/narratedPhrases";
 
     const totalQuestions = 20;
     let currentQuestionIndex = writable(0);
     let score = writable(0);
     let userAnswers = writable<boolean[]>([]);
     let toastRef: Toast;
+    let narratedRef: NarratedContent;
 
     let varIsAvatarEnabled = false;
     let varArePointsEnabled = false;
@@ -76,19 +83,49 @@
         toastRef.showToast(isSuccess, message);
     }
 
+    function unlockBadge(badgeNumber:number) {
+    const unlockedImages = [
+        '/img/badges/badge1.png',
+        '/img/badges/badge2.png',
+        '/img/badges/badge3.png',
+        '/img/badges/badge4.png',
+    ];
+    
+    const badge: any = document.getElementById(`badge${badgeNumber}`);
+    if (badge) {
+        badge.src = unlockedImages[badgeNumber];
+    }
+}
+
     const handleAnswer = (answer: string) => {
         // Antworten speichern
         if (correctAnswers[get(currentQuestionIndex)] === answer) {
             score.update((n) => n + 5);
             userAnswers.update((answers) => [...answers, true]);
             showToast(true);
+            callWithProbability(
+                0.5,
+                narratedRef.showNarration,
+                randomGoodPhrase(),
+            );
         } else {
             userAnswers.update((answers) => [...answers, false]);
             showToast(false);
+            callWithProbability(
+                0.5,
+                narratedRef.showNarration,
+                randomBadPhrase(),
+            );
         }
         console.log(get(currentQuestionIndex));
         currentQuestionIndex.update((n) => n + 1);
     };
+
+    score.subscribe((value) => {
+        if(value > 10){
+            unlockBadge(1);
+        }
+    });
 
     let questionImage = "/img/questions/q-0.png";
     currentQuestionIndex.subscribe((index) => {
@@ -115,10 +152,6 @@
     leaderboard.subscribe((value: any) => {
         sortedLeaderboard = value;
     });
-    /*
-    $: if (get(currentQuestionIndex) >= totalQuestions) {
-        goto("/posttest");
-    }*/
 </script>
 
 <div class="flex justify-between">
@@ -134,7 +167,8 @@
                         <th class="w-1/4">Profile</th>
                         {#if varArePointsEnabled}<th class="w-2/4 text-center"
                                 >Score</th
-                            >{/if}
+                            >
+                        {/if}
                     </tr>
                 </thead>
                 <tbody>
@@ -195,6 +229,9 @@
             </div>
         </div>
         <Toast bind:this={toastRef} />
+        {#if isNarratedContentEnabled}
+            <NarratedContent bind:this={narratedRef} />
+        {/if}
     </div>
     <!-- Scores and Badges -->
     <div class="w-1/4 mx-auto flex flex-col">
@@ -208,21 +245,46 @@
         {#if varAreBadgesEnabled}
             <div class="w-1/2 bg-base-200 p-4 rounded-xl shadow-md">
                 <div class="stat-title mb-5">Badges</div>
-                <div class="stack">
+                <div id="badgeGrid" class="grid grid-cols-2 gap-4">
                     <div
-                        class="grid w-32 h-20 rounded bg-primary text-primary-content place-content-center"
+                        class="grid w-32 h-32 rounded bg-base-100 text-accent-content items-center"
                     >
-                        1
+                        <img
+                            src="/img/lock.png"
+                            id="badge1"
+                            class="w-3/4 h-3/4 mx-auto"
+                            alt="Locked Badage 1"
+                        />
                     </div>
                     <div
-                        class="grid w-32 h-20 rounded bg-accent text-accent-content place-content-center"
+                        class="grid w-32 h-32 rounded bg-base-100 text-accent-content items-center"
                     >
-                        2
+                        <img
+                            src="/img/lock.png"
+                            id="badge2"
+                            class="w-3/4 h-3/4 mx-auto"
+                            alt="Locked Badage 2"
+                        />
                     </div>
                     <div
-                        class="grid w-32 h-20 rounded bg-secondary text-secondary-content place-content-center"
+                        class="grid w-32 h-32 rounded bg-base-100 text-accent-content items-center"
                     >
-                        3
+                        <img
+                            src="/img/lock.png"
+                            id="badge3"
+                            class="w-3/4 h-3/4 mx-auto"
+                            alt="Locked Badage 3"
+                        />
+                    </div>
+                    <div
+                        class="grid w-32 h-32 rounded bg-base-100 text-accent-content items-center"
+                    >
+                        <img
+                            src="/img/lock.png"
+                            id="badge4"
+                            class="w-3/4 h-3/4 mx-auto"
+                            alt="Locked Badage 4"
+                        />
                     </div>
                 </div>
             </div>
