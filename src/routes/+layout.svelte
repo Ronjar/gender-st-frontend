@@ -3,6 +3,7 @@
     import { isAvatarEnabled, avatarPath as storeAvatarPath } from "../store";
     import { get } from "svelte/store";
 
+    export const ssr = false;
 
     let avatarEnabled = false;
     let avatarPath = "";
