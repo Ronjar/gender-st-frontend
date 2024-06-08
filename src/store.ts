@@ -2,6 +2,7 @@ import { derived, get, writable } from 'svelte/store';
 
 export const pretestAnswers = writable<number[]>([]);
 export const questions = writable<boolean[]>([]);
+export const answerTime = writable<number[]>([]);
 export const posttestAnswers = writable<number[]>([]);
 
 export const gamifiedElements = writable<string>("");

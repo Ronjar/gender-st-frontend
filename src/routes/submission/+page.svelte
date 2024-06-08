@@ -3,14 +3,15 @@
   import {
     pretestAnswers as waPretestAnswers,
     questions as waQuestions,
-    posttestAnswers  as waPosttestAnswers,
+    answerTime as waAnswerTime,
+    posttestAnswers as waPosttestAnswers,
     round as waRound,
     gamifiedElements as waGamifiedElements,
-    userId as waUserId
-
+    userId as waUserId,
   } from "../../store";
-  import { get, writable } from "svelte/store";
+  import { get } from "svelte/store";
   import { goto } from "$app/navigation";
+  import { BASE_URL } from "$lib/constants";
 
   let loading = false;
   let apiResponse: number;
@@ -21,14 +22,15 @@
   });
 
   onMount(async () => {
-    const userId = get(waUserId)
+    const userId = get(waUserId);
     const pretest = get(waPretestAnswers);
     const questionList = get(waQuestions);
+    const answerTime = get(waAnswerTime);
     const posttest = get(waPosttestAnswers);
     const gamifiedElements = get(waGamifiedElements);
 
     try {
-      const response = await fetch("http://localhost:6969/addset", {
+      const response = await fetch(`${BASE_URL}/addset`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -38,7 +40,8 @@
           gamifiedElements: gamifiedElements,
           pretestAnswers: pretest,
           questions: questionList,
-          posttestAnswers: posttest
+          answerTime: answerTime,
+          posttestAnswers: posttest,
         }),
       });
 
@@ -73,7 +76,7 @@
 
 <div class="p-6 max-w-4xl mx-auto bg-base-200 rounded-xl shadow-md space-y-4">
   <h1>{getTitle()}</h1>
-  <p>Results are submitted any moment.</p>
+  <p>Results are submitted any moment...</p>
   {#if buttonVisiblility}
     <button
       class="btn btn-primary {loading ? 'loading' : ''}"

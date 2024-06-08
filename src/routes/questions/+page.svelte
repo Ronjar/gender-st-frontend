@@ -2,28 +2,34 @@
     import { writable, get, derived } from "svelte/store";
     import { goto } from "$app/navigation";
     import {
-        questions,
+        questions as waQuestions,
+        answerTime as waAnswerTime,
         isAvatarEnabled,
         arePointsEnabled,
         isLeaderboardEnabled,
         isNarratedContentEnabled,
         areBadgesEnabled,
         avatarPath,
+        round
     } from "../../store";
     import Toast from "$lib/components/Toast.svelte";
-    import NarratedContent from "$lib/components/NarratedContent.svelte";
+    import NarratedContent from "./NarratedContent.svelte";
     import {
         callWithProbability,
         randomBadPhrase,
         randomGoodPhrase,
     } from "$lib/scripts/narratedPhrases";
+    import Badges from "./Badges.svelte";
 
     const totalQuestions = 20;
     let currentQuestionIndex = writable(0);
     let score = writable(0);
     let userAnswers = writable<boolean[]>([]);
+    let answerTime = writable<number[]>([]);
+    let questionStartTime: number;
     let toastRef: Toast;
     let narratedRef: NarratedContent;
+    let badgesRef: Badges;
 
     let varIsAvatarEnabled = false;
     let varArePointsEnabled = false;
@@ -83,28 +89,18 @@
         toastRef.showToast(isSuccess, message);
     }
 
-    function unlockBadge(badgeNumber:number) {
-    const unlockedImages = [
-        '/img/badges/badge1.png',
-        '/img/badges/badge2.png',
-        '/img/badges/badge3.png',
-        '/img/badges/badge4.png',
-    ];
-    
-    const badge: any = document.getElementById(`badge${badgeNumber}`);
-    if (badge) {
-        badge.src = unlockedImages[badgeNumber];
-    }
-}
-
     const handleAnswer = (answer: string) => {
+        narratedRef.hideNarration();
+        const endTime = Date.now();
+        const timeTaken = endTime - questionStartTime;
+        answerTime.update((times) => [...times, timeTaken]);
         // Antworten speichern
         if (correctAnswers[get(currentQuestionIndex)] === answer) {
             score.update((n) => n + 5);
             userAnswers.update((answers) => [...answers, true]);
             showToast(true);
             callWithProbability(
-                0.5,
+                1,
                 narratedRef.showNarration,
                 randomGoodPhrase(),
             );
@@ -112,28 +108,39 @@
             userAnswers.update((answers) => [...answers, false]);
             showToast(false);
             callWithProbability(
-                0.5,
+                1,
                 narratedRef.showNarration,
                 randomBadPhrase(),
             );
         }
-        console.log(get(currentQuestionIndex));
         currentQuestionIndex.update((n) => n + 1);
     };
 
     score.subscribe((value) => {
-        if(value > 10){
-            unlockBadge(1);
+        switch (value / 5) {
+            case 1:
+                badgesRef.unlockBadge(1);
+                break;
+            case 5:
+                badgesRef.unlockBadge(2);
+                break;
+            case 10:
+                badgesRef.unlockBadge(3);
+                break;
+            case 18:
+                badgesRef.unlockBadge(4);
+                break;
         }
     });
 
-    let questionImage = "/img/questions/q-0.png";
+    let questionImage = `/img/questions/q-${0+(get(round)-1)*20}.png`;
     currentQuestionIndex.subscribe((index) => {
         if (index >= totalQuestions) {
-            questions.set(get(userAnswers));
+            waAnswerTime.set(get(answerTime));
+            waQuestions.set(get(userAnswers));
             goto("/posttest");
         }
-        questionImage = `/img/questions/q-${index}.png`;
+        questionImage = `/img/questions/q-${index+(get(round)-1)*20}.png`;
     });
 
     const leaderboard = derived(score, ($score) => {
@@ -152,6 +159,10 @@
     leaderboard.subscribe((value: any) => {
         sortedLeaderboard = value;
     });
+
+    function handleImageLoad() {
+        questionStartTime = Date.now();
+    }
 </script>
 
 <div class="flex justify-between">
@@ -164,7 +175,8 @@
                 <thead class="my-10">
                     <tr class="my-10">
                         <th class="w-1/4">Rank</th>
-                        <th class="w-1/4">Profile</th>
+                        {#if varIsAvatarEnabled}<th class="w-1/4">Profile</th>
+                        {/if}
                         {#if varArePointsEnabled}<th class="w-2/4 text-center"
                                 >Score</th
                             >
@@ -177,13 +189,15 @@
                             class={player.isYou ? "bg-gray-800" : "bg-base-200"}
                         >
                             <td class="text-center text-lg">{index + 1}</td>
-                            <td class="flex justify-center items-center">
-                                <img
-                                    src={player.profilePic}
-                                    alt="profile"
-                                    class="w-20 h-20 rounded-full"
-                                />
-                            </td>
+                            {#if varIsAvatarEnabled}
+                                <td class="flex justify-center items-center">
+                                    <img
+                                        src={player.profilePic}
+                                        alt="profile"
+                                        class="w-20 h-20 rounded-full"
+                                    />
+                                </td>
+                            {/if}
                             {#if varArePointsEnabled}<td
                                     class="text-center text-lg"
                                     >{player.score}</td
@@ -201,8 +215,9 @@
             <div class="flex flex-col items-center">
                 <img
                     src={questionImage}
-                    alt="Question Image"
+                    alt="Question"
                     class="w-3/4 h-3/4"
+                    on:load={handleImageLoad}
                 />
                 <div class="flex mt-4 space-x-4">
                     <button
@@ -243,51 +258,7 @@
             </div>
         {/if}
         {#if varAreBadgesEnabled}
-            <div class="w-1/2 bg-base-200 p-4 rounded-xl shadow-md">
-                <div class="stat-title mb-5">Badges</div>
-                <div id="badgeGrid" class="grid grid-cols-2 gap-4">
-                    <div
-                        class="grid w-32 h-32 rounded bg-base-100 text-accent-content items-center"
-                    >
-                        <img
-                            src="/img/lock.png"
-                            id="badge1"
-                            class="w-3/4 h-3/4 mx-auto"
-                            alt="Locked Badage 1"
-                        />
-                    </div>
-                    <div
-                        class="grid w-32 h-32 rounded bg-base-100 text-accent-content items-center"
-                    >
-                        <img
-                            src="/img/lock.png"
-                            id="badge2"
-                            class="w-3/4 h-3/4 mx-auto"
-                            alt="Locked Badage 2"
-                        />
-                    </div>
-                    <div
-                        class="grid w-32 h-32 rounded bg-base-100 text-accent-content items-center"
-                    >
-                        <img
-                            src="/img/lock.png"
-                            id="badge3"
-                            class="w-3/4 h-3/4 mx-auto"
-                            alt="Locked Badage 3"
-                        />
-                    </div>
-                    <div
-                        class="grid w-32 h-32 rounded bg-base-100 text-accent-content items-center"
-                    >
-                        <img
-                            src="/img/lock.png"
-                            id="badge4"
-                            class="w-3/4 h-3/4 mx-auto"
-                            alt="Locked Badage 4"
-                        />
-                    </div>
-                </div>
-            </div>
+            <Badges bind:this={badgesRef} />
         {/if}
     </div>
 </div>

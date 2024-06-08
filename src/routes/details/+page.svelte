@@ -2,6 +2,7 @@
     import {gamifiedElements, userId} from '../../store'
     import { goto } from '$app/navigation';
     import { get } from 'svelte/store';
+    import { BASE_URL } from '$lib/constants';
   
     let gender = '';
     let age = '';
@@ -167,7 +168,7 @@
   
       loading = true;
       try {
-        const response = await fetch('http://localhost:6969/adduser', {
+        const response = await fetch(`${BASE_URL}/adduser`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
