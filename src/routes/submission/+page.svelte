@@ -9,13 +9,13 @@
     gamifiedElements as waGamifiedElements,
     userId as waUserId,
   } from "../../store";
-  import { get } from "svelte/store";
+  import { writable, get } from "svelte/store";
   import { goto } from "$app/navigation";
   import { BASE_URL } from "$lib/constants";
 
   let loading = false;
   let apiResponse: number;
-  let buttonVisiblility = false;
+  let buttonVisiblility = writable(false);
   let round: number;
   waRound.subscribe((value) => {
     round = value;
@@ -53,7 +53,8 @@
       waRound.set(data.round);
       waGamifiedElements.set(data.gamifiedElements);
       if (data.round > 0) {
-        buttonVisiblility = true;
+        
+        buttonVisiblility.set(true);
       }
     } catch (error) {
       console.error("Error uploading data:", error);
@@ -77,7 +78,7 @@
 <div class="p-6 max-w-4xl mx-auto bg-base-200 rounded-xl shadow-md space-y-4">
   <h1>{getTitle()}</h1>
   <p>Results are submitted any moment...</p>
-  {#if buttonVisiblility}
+  {#if $buttonVisiblility}
     <button
       class="btn btn-primary {loading ? 'loading' : ''}"
       on:click={finishSurvey}
