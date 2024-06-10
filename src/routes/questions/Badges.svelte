@@ -4,7 +4,7 @@
             id: 1,
             src: "/img/badges/badge1.png",
             unlocked: false,
-            tooltip: "Get 1 right answers",
+            tooltip: "Get 1 right answer",
         },
         {
             id: 2,
@@ -52,6 +52,6 @@
                 </div>
             </div>
         {/each}
-        <div class="stat-desc">Hover a badge to see the requirements</div>
+        <div class="stat-desc">Hover a badge to see its requirements</div>
     </div>
 </div>

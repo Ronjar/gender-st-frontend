@@ -15,16 +15,20 @@ export const avatarPath = writable<string>("");
 
 
 export const arePointsEnabled = derived(gamifiedElements, ($gamifiedElements: string) => {
-    return $gamifiedElements.includes('p');
+    //return $gamifiedElements.includes('p');
+    return true;
 });
 export const areBadgesEnabled = derived(gamifiedElements, ($gamifiedElements: string) => {
-    return true; //return $gamifiedElements.includes('b');
+    //return $gamifiedElements.includes('b');
+    return true;
 });
 export const isLeaderboardEnabled = derived(gamifiedElements, ($gamifiedElements: string) => {
-    return $gamifiedElements.includes('l');
+    //return $gamifiedElements.includes('l');
+    return true;
 });
 export const isAvatarEnabled = derived(gamifiedElements, ($gamifiedElements: string) => {
-    return $gamifiedElements.includes('a');
+    //return $gamifiedElements.includes('a');
+    return true;
 });
 export const isNarratedContentEnabled = derived(gamifiedElements, ($gamifiedElements: string) => {
     return $gamifiedElements.includes('n');

@@ -101,11 +101,6 @@
 </div>
 -->
 <style>
-  .button {
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-  }
 
   .loading {
     cursor: not-allowed;
