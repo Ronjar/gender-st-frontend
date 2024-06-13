@@ -1,13 +1,16 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import {
-    pretestAnswers as waPretestAnswers,
-    questions as waQuestions,
-    answerTime as waAnswerTime,
-    posttestAnswers as waPosttestAnswers,
-    round as waRound,
-    gamifiedElements as waGamifiedElements,
-    userId as waUserId,
+    stai as wStai,
+    ngse as wNgse,
+    sims as wSims,
+    questions as wQuestions,
+    answerTime as wAnswerTime,
+    round as wRound,
+    gamifiedElements as wGamifiedElements,
+    isAvatarEnabled as wIsAvatarEnabled,
+    userId as wUserId,
+    isAvatarEnabled,
   } from "../../store";
   import { writable, get } from "svelte/store";
   import { goto } from "$app/navigation";
@@ -17,17 +20,19 @@
   let apiResponse: number;
   let buttonVisiblility = writable(false);
   let round: number;
-  waRound.subscribe((value) => {
+  wRound.subscribe((value) => {
     round = value;
   });
 
   onMount(async () => {
-    const userId = get(waUserId);
-    const pretest = get(waPretestAnswers);
-    const questionList = get(waQuestions);
-    const answerTime = get(waAnswerTime);
-    const posttest = get(waPosttestAnswers);
-    const gamifiedElements = get(waGamifiedElements);
+    const userId = get(wUserId);
+    const round = get(wRound);
+    const stai = get(wStai);
+    const ngse = get(wNgse);
+    const sims = get(wSims);
+    const questions = get(wQuestions);
+    const answerTime = get(wAnswerTime);
+    const gamifiedElements = get(wGamifiedElements)[round];
 
     try {
       const response = await fetch(`${BASE_URL}/addset`, {
@@ -38,10 +43,11 @@
         body: JSON.stringify({
           userId: userId,
           gamifiedElements: gamifiedElements,
-          pretestAnswers: pretest,
-          questions: questionList,
+          stai: stai,
+          ngse: ngse,
+          sims: sims,
+          questions: questions,
           answerTime: answerTime,
-          posttestAnswers: posttest,
         }),
       });
 
@@ -50,10 +56,8 @@
       }
 
       const data = await response.json();
-      waRound.set(data.round);
-      waGamifiedElements.set(data.gamifiedElements);
+      wRound.set(data.round);
       if (data.round > 0) {
-        
         buttonVisiblility.set(true);
       }
     } catch (error) {
@@ -63,24 +67,32 @@
   });
 
   function getTitle() {
-    if (round < 3) {
-      return "End of study part " + round;
+    if (round < 2) {
+      return `End of study part ${round+1}`;
     } else {
-      ("End of study");
+      ("End of study, tank you for your participation");
     }
   }
 
   const finishSurvey = async () => {
-    goto("pretest");
+    if (get(isAvatarEnabled)) {
+      alert(`${get(isAvatarEnabled)} + ${get(wRound)}`);
+      goto("/avatars");
+    } else {
+      goto("questions");
+    }
   };
 </script>
 
 <div class="p-6 max-w-4xl mx-auto bg-base-200 rounded-xl shadow-md space-y-4">
   <h1>{getTitle()}</h1>
-  <p>Results are submitted any moment...</p>
+  {#if !$buttonVisiblility}
+    <p>Results are submitted any moment...</p>
+  {/if}
   {#if $buttonVisiblility}
+    <p>Results are submitted</p>
     <button
-      class="btn btn-primary {loading ? 'loading' : ''}"
+      class="btn btn-primary mt-5 {loading ? 'loading' : ''}"
       on:click={finishSurvey}
       disabled={loading}
     >
@@ -89,20 +101,7 @@
   {/if}
 </div>
 
-<!--
-<div>
-  <p>Vielen Dank, dass Sie an unserer Umfrage teilgenommen haben!</p>
-  <button
-    class="button {loading ? 'loading' : ''}"
-    on:click={finishSurvey}
-    disabled={loading}
-  >
-    {loading ? "Wird geladen..." : "Umfrage beenden"}
-  </button>
-</div>
--->
 <style>
-
   .loading {
     cursor: not-allowed;
     opacity: 0.6;

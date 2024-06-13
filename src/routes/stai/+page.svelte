@@ -1,34 +1,20 @@
 <script lang="ts">
-  import { pretestAnswers, isAvatarEnabled } from "../../store";
+  import { stai, isAvatarEnabled } from "../../store";
   import { goto } from "$app/navigation";
-  import Toast from "./Toast.svelte";
+  import Toast from "$lib/components/FormToast.svelte";
 
-  let answers: number[] = Array(20).fill(-1);
+  let answers: number[] = Array(6).fill(-1);
   let errorMessage: string = "";
   let loading: boolean = false;
   let toastRef: Toast;
 
   const questions: string[] = [
-    "I feel calm",
-    "I feel secure",
-    "I feel tense",
-    "I feel strained",
-    "I feel at ease",
-    "I feel upset",
-    "I am presently worrying over possible misfortunes",
-    "I feel satisfied",
-    "I feel frightened",
-    "I feel uncomfortable",
-    "I feel self confident",
-    "I feel nervous",
-    "I feel jittery",
-    "I feel indecisive",
-    "I am relaxed",
-    "I feel content",
-    "I am worried",
-    "I feel confused",
-    "I feel steady",
-    "I feel pleasant",
+    "Right now I feel calm",
+    "Right now I am tense",
+    "Right now I feel upset",
+    "Right now I am relaxed",
+    "Right now I feel content",
+    "Right now I am worried"
   ];
 
   const handleSubmit = async (event: Event) => {
@@ -43,12 +29,8 @@
     loading = true;
     try {
       // Store the answers in localStorage to be used later
-      pretestAnswers.set(answers);
-      if (isAvatarEnabled) {
-        goto("/avatars");
-      } else {
-        goto("/questions"); // Navigate to the questions page
-      }
+      stai.set(answers);
+      goto("/ngse");
     } catch (error) {
       errorMessage = "An error occurred. Please try again.";
     } finally {
@@ -58,16 +40,8 @@
 </script>
 
 <div class="p-6 max-w-4xl mx-auto bg-base-200 rounded-xl shadow-md space-y-4">
-  <h1 class="text-2xl font-bold mb-6">Pretest</h1>
+  <h1 class="text-2xl font-bold mb-6">STAI</h1>
   <form on:submit={handleSubmit} class="space-y-6 w-full max-w-4xl">
-    <!--{#if errorMessage}
-      <div class="alert alert-error">
-        <div class="flex-1">
-          <label>{errorMessage}</label>
-        </div>
-      </div>
-    {/if}-->
-
     <div role="alert" class="alert bg-base-300">
       <svg
         xmlns="http://www.w3.org/2000/svg"

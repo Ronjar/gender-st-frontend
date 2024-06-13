@@ -10,10 +10,12 @@
         isNarratedContentEnabled as waNarratedContent,
         areBadgesEnabled as waBadges,
         avatarPath,
-        round
+        round,
+        roundBasedPadding,
     } from "../../store";
     import Toast from "$lib/components/Toast.svelte";
     import NarratedContent from "./NarratedContent.svelte";
+    import ScoreModal from "$lib/components/ScoreModal.svelte";
     import {
         callWithProbability,
         randomBadPhrase,
@@ -22,7 +24,7 @@
     import Badges from "./Badges.svelte";
 
     const totalQuestions = 20;
-    let currentQuestionIndex = writable(0);
+    let currentQuestionIndex = writable(0 + get(roundBasedPadding));
     let score = writable(0);
     let userAnswers = writable<boolean[]>([]);
     let answerTime = writable<number[]>([]);
@@ -30,12 +32,14 @@
     let toastRef: Toast;
     let narratedRef: NarratedContent;
     let badgesRef: Badges;
+    let scoreModalRef: ScoreModal;
 
     let isAvatarEnabled = false;
     let arePointsEnabled = false;
     let isLeaderboardEnabled = false;
     let isNarratedContentEnabled = false;
     let areBadgesEnabled = false;
+    let areQuestionsFinished = false;
 
     waAvatars.subscribe((value) => {
         isAvatarEnabled = value;
@@ -54,7 +58,7 @@
     });
 
     let correctAnswers = [
-        "B",
+        "B", //0
         "E",
         "E",
         "E",
@@ -64,7 +68,7 @@
         "E",
         "B",
         "B",
-        "E",
+        "E", //10
         "B",
         "C",
         "E",
@@ -74,6 +78,46 @@
         "D",
         "B",
         "A",
+        "C", //20
+        "D",
+        "A",
+        "B",
+        "D",
+        "A",
+        "A",
+        "A",
+        "C",
+        "D",
+        "B", //30
+        "D",
+        "A",
+        "B",
+        "A",
+        "B",
+        "A",
+        "B",
+        "A",
+        "B",
+        "E", //40
+        "B",
+        "C",
+        "C",
+        "E",
+        "C",
+        "E",
+        "C",
+        "E",
+        "C",
+        "B", //50
+        "D",
+        "B",
+        "C",
+        "C",
+        "D",
+        "A",
+        "E",
+        "D",
+        "D",
     ];
 
     let opponents = [
@@ -90,7 +134,9 @@
     }
 
     const handleAnswer = (answer: string) => {
-        narratedRef.hideNarration();
+        if (narratedRef !== undefined) {
+            narratedRef.hideNarration();
+        }
         const endTime = Date.now();
         const timeTaken = endTime - questionStartTime;
         answerTime.update((times) => [...times, timeTaken]);
@@ -99,48 +145,57 @@
             score.update((n) => n + 5);
             userAnswers.update((answers) => [...answers, true]);
             showToast(true);
-            callWithProbability(
-                1,
-                narratedRef.showNarration,
-                randomGoodPhrase(),
-            );
+            if (narratedRef !== undefined) {
+                callWithProbability(
+                    0.2,
+                    narratedRef.showNarration,
+                    randomGoodPhrase(),
+                );
+            }
         } else {
             userAnswers.update((answers) => [...answers, false]);
             showToast(false);
-            callWithProbability(
-                1,
-                narratedRef.showNarration,
-                randomBadPhrase(),
-            );
+            if (narratedRef !== undefined) {
+                callWithProbability(
+                    0.2,
+                    narratedRef.showNarration,
+                    randomBadPhrase(),
+                );
+            }
         }
         currentQuestionIndex.update((n) => n + 1);
     };
 
     score.subscribe((value) => {
-        switch (value / 5) {
-            case 1:
-                badgesRef.unlockBadge(1);
-                break;
-            case 5:
-                badgesRef.unlockBadge(2);
-                break;
-            case 10:
-                badgesRef.unlockBadge(3);
-                break;
-            case 18:
-                badgesRef.unlockBadge(4);
-                break;
+        if (badgesRef !== undefined) {
+            switch (value / 5) {
+                case 1:
+                    badgesRef.unlockBadge(1);
+                    break;
+                case 5:
+                    badgesRef.unlockBadge(2);
+                    break;
+                case 10:
+                    badgesRef.unlockBadge(3);
+                    break;
+                case 18:
+                    badgesRef.unlockBadge(4);
+                    break;
+            }
         }
     });
 
-    let questionImage = `/img/questions/q-${0+(get(round)-1)*20}.png`;
+    let questionImage = `/img/questions/q-${0 + get(roundBasedPadding)}.png`;
     currentQuestionIndex.subscribe((index) => {
-        if (index >= totalQuestions) {
+        console.log(get(roundBasedPadding));
+        if (get(userAnswers).length < totalQuestions) {
+            questionImage = `/img/questions/q-${index}.png`;
+        } else {
             waAnswerTime.set(get(answerTime));
             waQuestions.set(get(userAnswers));
-            goto("/posttest");
+            areQuestionsFinished = true;
+            scoreModalRef.openModal();
         }
-        questionImage = `/img/questions/q-${index+(get(round)-1)*20}.png`;
     });
 
     const leaderboard = derived(score, ($score) => {
@@ -165,6 +220,7 @@
     }
 </script>
 
+<ScoreModal bind:this={scoreModalRef} />
 <div class="flex justify-between">
     <!-- Scoreboard -->
     <div class="w-1/4 mx-auto">
@@ -210,41 +266,50 @@
     </div>
     <!-- Question Board -->
     <div class="p-6 w-1/2 mx-10 bg-base-200 rounded-xl shadow-md">
-        <p class="text-xl">Answer the following question</p>
-        <p class="text-m mb-20">Select the option most</p>
-        <div class="flex justify-between items-center">
-            <div class="flex flex-col items-center">
-                <img
-                    src={questionImage}
-                    alt="Question"
-                    class="w-3/4 h-3/4"
-                    on:load={handleImageLoad}
-                />
-                <div class="flex mt-4 space-x-4">
-                    <button
-                        class="btn btn-primary"
-                        on:click={() => handleAnswer("A")}>Option A</button
-                    >
-                    <button
-                        class="btn btn-primary"
-                        on:click={() => handleAnswer("B")}>Option B</button
-                    >
-                    <button
-                        class="btn btn-primary"
-                        on:click={() => handleAnswer("C")}>Option C</button
-                    >
-                    <button
-                        class="btn btn-primary"
-                        on:click={() => handleAnswer("D")}>Option D</button
-                    >
-                    <button
-                        class="btn btn-primary"
-                        on:click={() => handleAnswer("E")}>Option E</button
-                    >
+        {#if !areQuestionsFinished}
+            <p class="text-xl">Answer the following question</p>
+            <p class="text-m mb-20">Select the option most</p>
+            <div class="flex justify-between items-center">
+                <div class="flex flex-col items-center">
+                    <img
+                        src={questionImage}
+                        alt="Question"
+                        class="w-3/4 h-3/4"
+                        on:load={handleImageLoad}
+                    />
+                    <div class="flex mt-4 space-x-4">
+                        <button
+                            class="btn btn-primary"
+                            on:click={() => handleAnswer("A")}>Option A</button
+                        >
+                        <button
+                            class="btn btn-primary"
+                            on:click={() => handleAnswer("B")}>Option B</button
+                        >
+                        <button
+                            class="btn btn-primary"
+                            on:click={() => handleAnswer("C")}>Option C</button
+                        >
+                        <button
+                            class="btn btn-primary"
+                            on:click={() => handleAnswer("D")}>Option D</button
+                        >
+                        <button
+                            class="btn btn-primary"
+                            on:click={() => handleAnswer("E")}>Option E</button
+                        >
+                    </div>
                 </div>
             </div>
-        </div>
-        <Toast bind:this={toastRef} />
+            <Toast bind:this={toastRef} />
+        {/if}
+        {#if areQuestionsFinished}
+            <div class="flex justify-center items-center h-64">
+                <a class="btn btn-primary mx-auto" href="/stai">
+                    Proceed to next page
+                </a>
+            </div>
+        {/if}
         {#if isNarratedContentEnabled}
             <NarratedContent bind:this={narratedRef} />
         {/if}

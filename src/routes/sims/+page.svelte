@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { sims} from "../../store";
     import { goto } from "$app/navigation";
     import Toast from "$lib/components/FormToast.svelte";
 
@@ -11,15 +12,15 @@
         "Because I think that this activity is interesting",
         "Because I am doing it for my own good",
         "Because I am supposed to do it",
-        "There may be good reasons to do this activity, but personally I don’t see any",
+        "There may be good reasons to do this activity, but personally I don't see any",
         "Because I think that this activity is pleasant",
         "Because I think that this activity is good for me",
         "Because it is something that I have to do",
         "I do this activity but I am not sure if it is worth it",
         "Because this activity is fun",
         "By personal decision",
-        "Because I don’t have any choice",
-        "I don’t know; I don’t see what this activity brings me",
+        "Because I don't have any choice",
+        "I don't know; I don't see what this activity brings me",
         "Because I feel good when doing this activity",
         "Because I believe that this activity is important for me",
         "Because I feel that I have to do it",
@@ -38,7 +39,8 @@
         loading = true;
         try {
             // Implement your logic for storing answers or navigating
-            goto("/results"); // Example redirect
+            sims.set(answers)
+            goto("/submission");
         } catch (error) {
             errorMessage = "An error occurred. Please try again.";
         } finally {
@@ -48,8 +50,27 @@
 </script>
 
 <div class="p-6 max-w-4xl mx-auto bg-base-200 rounded-xl shadow-md space-y-4">
-    <h1 class="text-2xl font-bold mb-6">Situational Motivation Scale</h1>
-    <form on:submit={handleSubmit}>
+    <h1 class="text-2xl font-bold mb-6">Why are you currently engaged in this activity?</h1>
+    <form on:submit={handleSubmit} class="space-y-6 w-full max-w-4xl">
+        <div role="alert" class="alert bg-base-300">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              class="stroke-info shrink-0 w-6 h-6"
+              ><path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              ></path></svg
+            >
+            <span
+              >Evaluate yourself using the following questions. Take your time and
+              answer each question honestly and to the best of your knowledge.</span
+            >
+          </div>
+
         {#each questions as question, index}
             <div class="card bg-base-300 p-4 rounded-lg shadow-md">
                 <div class="form-control">
@@ -91,6 +112,21 @@
 
 <style>
     .loading-spinner {
-        /* Add your spinner styles here */
+      border: 2px solid transparent;
+      border-radius: 50%;
+      border-top: 2px solid white;
+      border-right: 2px solid white;
+      width: 1em;
+      height: 1em;
+      animation: spin 1s linear infinite;
     }
-</style>
+  
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
