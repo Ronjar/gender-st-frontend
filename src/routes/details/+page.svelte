@@ -229,7 +229,7 @@
         if (isAvatarEnabled) {
           goto("/avatars");
         } else {
-          goto("/motivation");
+          goto("/questions");
         }
       } else {
         errorMessage = data.message || "An error occurred. Please try again.";

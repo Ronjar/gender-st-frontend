@@ -10,7 +10,6 @@
     gamifiedElements as wGamifiedElements,
     isAvatarEnabled as wIsAvatarEnabled,
     userId as wUserId,
-    isAvatarEnabled,
   } from "../../store";
   import { writable, get } from "svelte/store";
   import { goto } from "$app/navigation";
@@ -26,13 +25,20 @@
 
   onMount(async () => {
     const userId = get(wUserId);
-    const round = get(wRound);
     const stai = get(wStai);
     const ngse = get(wNgse);
     const sims = get(wSims);
     const questions = get(wQuestions);
     const answerTime = get(wAnswerTime);
     const gamifiedElements = get(wGamifiedElements)[round];
+    round = get(wRound);
+    //const stai = [1,2,3,1,2,3];
+    //const ngse = [1,2,3,4,1,2,3,4];
+    //const sims = [1,2,3,4,1,2,3,4,1,2,3,4,1,2,3,4];
+    //const questions = [true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false];
+    //const answerTime = [1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000,];
+    //const gamifiedElements = "pblan";
+
 
     try {
       const response = await fetch(`${BASE_URL}/addset`, {
@@ -56,8 +62,8 @@
       }
 
       const data = await response.json();
-      wRound.set(data.round);
-      if (data.round > 0) {
+      if (data.round > 0 || data.round < 3) {
+        wRound.set(data.round);
         buttonVisiblility.set(true);
       }
     } catch (error) {
@@ -70,16 +76,15 @@
     if (round < 2) {
       return `End of study part ${round+1}`;
     } else {
-      ("End of study, tank you for your participation");
+      return "End of study, tank you for your participation";
     }
   }
 
   const finishSurvey = async () => {
-    if (get(isAvatarEnabled)) {
-      alert(`${get(isAvatarEnabled)} + ${get(wRound)}`);
+    if (get(wIsAvatarEnabled)) {
       goto("/avatars");
     } else {
-      goto("questions");
+      goto("/questions");
     }
   };
 </script>
