@@ -93,7 +93,7 @@
         "A",
         "B",
         "A",
-        "B",
+        "D",
         "A",
         "B",
         "A",
@@ -147,7 +147,7 @@
             showToast(true);
             if (narratedRef !== undefined) {
                 callWithProbability(
-                    0.2,
+                    0.4,
                     narratedRef.showNarration,
                     randomGoodPhrase(),
                 );
@@ -157,7 +157,7 @@
             showToast(false);
             if (narratedRef !== undefined) {
                 callWithProbability(
-                    0.2,
+                    0.4,
                     narratedRef.showNarration,
                     randomBadPhrase(),
                 );
@@ -187,14 +187,20 @@
 
     let questionImage = `/img/questions/q-${0 + get(roundBasedPadding)}.png`;
     currentQuestionIndex.subscribe((index) => {
-        console.log(get(roundBasedPadding));
         if (get(userAnswers).length < totalQuestions) {
             questionImage = `/img/questions/q-${index}.png`;
         } else {
+            scoreModalRef.setScore(get(score));
+            if (areBadgesEnabled) {
+                scoreModalRef.setBadgeCount(badgesRef.unlockedBadgesCount);
+            }
+            scoreModalRef.setLeaderboardPlace(
+                sortedLeaderboard.findIndex((player) => player.isYou) + 1,
+            );
+            scoreModalRef.openModal();
             waAnswerTime.set(get(answerTime));
             waQuestions.set(get(userAnswers));
             areQuestionsFinished = true;
-            scoreModalRef.openModal();
         }
     });
 

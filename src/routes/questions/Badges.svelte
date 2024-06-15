@@ -26,6 +26,8 @@
         },
     ];
 
+    export const unlockedBadgesCount = badges.filter(badge => badge.unlocked).length;
+
     export function unlockBadge(id: number) {
         badges = badges.map((badge) => {
             if (badge.id === id) {
