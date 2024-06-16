@@ -227,6 +227,9 @@
 </script>
 
 <ScoreModal bind:this={scoreModalRef} />
+{#if isNarratedContentEnabled}
+    <NarratedContent bind:this={narratedRef} />
+{/if}
 <div class="flex justify-between">
     <!-- Scoreboard -->
     <div class="w-1/4 mx-auto">
@@ -274,7 +277,7 @@
     <div class="p-6 w-1/2 mx-10 bg-base-200 rounded-xl shadow-md">
         {#if !areQuestionsFinished}
             <p class="text-xl">Answer the following question</p>
-            <p class="text-m mb-20">Select the option most</p>
+            <p class="text-m mb-20">Choose the option that best fits to replace the question mark</p>
             <div class="flex justify-between items-center">
                 <div class="flex flex-col items-center">
                     <img
@@ -307,7 +310,6 @@
                     </div>
                 </div>
             </div>
-            <Toast bind:this={toastRef} />
         {/if}
         {#if areQuestionsFinished}
             <div class="flex justify-center items-center h-64">
@@ -316,9 +318,7 @@
                 </a>
             </div>
         {/if}
-        {#if isNarratedContentEnabled}
-            <NarratedContent bind:this={narratedRef} />
-        {/if}
+        <Toast bind:this={toastRef} />
     </div>
     <!-- Scores and Badges -->
     <div class="w-1/4 mx-auto flex flex-col">

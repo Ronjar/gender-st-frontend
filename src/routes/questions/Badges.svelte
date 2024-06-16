@@ -48,7 +48,7 @@
                         src={badge.src}
                         alt="Badge"
                         class="w-24 h-24 rounded-xl {badge.unlocked
-                            ? 'animate-bling'
+                            ? 'animate-unlock'
                             : 'grayscale'}"
                     />
                 </div>

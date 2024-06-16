@@ -12,17 +12,17 @@
     setTimeout(() => {
       visible = false;
       dispatch("dismiss");
-    }, 1000);
+    }, 3000);
   }
 </script>
 
-<div class="fixed right-10 bottom-10">
+<div class="fixed bottom-0 right-0 mb-10 mr-10 w-1/3">
   {#if visible}
     <div
       class={`alert shadow-lg`}
     >
       <div>
-        <span>{message}</span>
+        <span class="text-xl p-6">{message}</span>
       </div>
     </div>
   {/if}

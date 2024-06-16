@@ -366,7 +366,7 @@
           <span class="loading loading-spinner"></span>
         {/if}
         {#if !loading}
-          Proceed to Pretest
+          Proceed to next page
         {/if}
       </button>
     </div>

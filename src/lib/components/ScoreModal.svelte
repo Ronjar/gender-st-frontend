@@ -1,24 +1,45 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import {
+    arePointsEnabled as wwaPoints,
+    isLeaderboardEnabled as waLeaderboard,
+    areBadgesEnabled as waBadges,
+  } from "../../store";
 
   let modal: any;
   let score = 0;
   let badgeCount = 0;
-  let leaderboardPlace = 6
+  let leaderboardPlace = 6;
 
-  export function setScore(vScore:number){
+  let arePointsEnabled = false;
+  let isLeaderboardEnabled = false;
+  let areBadgesEnabled = false;
+
+  export function setScore(vScore: number) {
     score = vScore;
   }
-  export function setBadgeCount(vBadgeCount: number){
+  export function setBadgeCount(vBadgeCount: number) {
     badgeCount = vBadgeCount;
   }
   export function setLeaderboardPlace(vLeaderboardPlace: number) {
     leaderboardPlace = vLeaderboardPlace;
   }
 
+  wwaPoints.subscribe((value) => {
+    arePointsEnabled = value;
+  });
+  waLeaderboard.subscribe((value) => {
+    isLeaderboardEnabled = value;
+  });
+  waBadges.subscribe((value) => {
+    areBadgesEnabled = value;
+  });
+
   export function openModal() {
-    if (modal) {
-      modal.showModal();
+    if (isLeaderboardEnabled || areBadgesEnabled || arePointsEnabled) {
+      if (modal) {
+        modal.showModal();
+      }
     }
   }
 
@@ -33,23 +54,27 @@
     <h3 class="font-bold text-lg">You finished this rounds questions</h3>
     <p>These are the results</p>
     <div class="stats bg-base-200 shadow m-5">
-      <div class="stat">
-        <div class="stat-title">Score</div>
-        <div class="stat-value text-primary">{score}</div>
-        <div class="stat-desc">right answers</div>
-      </div>
-      
-      <div class="stat">
-        <div class="stat-title">Badges</div>
-        <div class="stat-value text-secondary">{badgeCount}</div>
-        <div class="stat-desc">badges unlocked</div>
-      </div>
-      
-      <div class="stat">
-        <div class="stat-title">You placed</div>
-        <div class="stat-value">{leaderboardPlace}</div>
-        <div class="stat-desc text-secondary">on the Leaderboard</div>
-      </div>
+      {#if arePointsEnabled}
+        <div class="stat">
+          <div class="stat-title">Score</div>
+          <div class="stat-value text-primary">{score}</div>
+          <div class="stat-desc">right answers</div>
+        </div>
+      {/if}
+      {#if areBadgesEnabled}
+        <div class="stat">
+          <div class="stat-title">Badges</div>
+          <div class="stat-value text-secondary">{badgeCount}</div>
+          <div class="stat-desc">badges unlocked</div>
+        </div>
+      {/if}
+      {#if isLeaderboardEnabled}
+        <div class="stat">
+          <div class="stat-title">You placed</div>
+          <div class="stat-value">{leaderboardPlace}</div>
+          <div class="stat-desc text-secondary">on the Leaderboard</div>
+        </div>
+      {/if}
     </div>
     <div class="modal-action">
       <form method="dialog">
