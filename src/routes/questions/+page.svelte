@@ -234,8 +234,10 @@
     <!-- Scoreboard -->
     <div class="w-1/4 mx-auto">
         {#if isLeaderboardEnabled}
+        <div class="bg-base-200 shadow-md rounded-xl p-6">
+            <span class="text-primary stat-value"><b>Leaderboard</b></span>
             <table
-                class="table w-full bg-base-200 shadow-md rounded-xl table-auto"
+                class="table w-full table-auto mt-10"
             >
                 <thead class="my-10">
                     <tr class="my-10">
@@ -271,6 +273,7 @@
                     {/each}
                 </tbody>
             </table>
+        </div>
         {/if}
     </div>
     <!-- Question Board -->
