@@ -9,12 +9,10 @@
 <div class="p-6 max-w-4xl mx-auto bg-base-200 rounded-xl shadow-md space-y-4">
   <h1>Welcome to the survey and thank you for your time and interest!</h1>
   <p>
-    This survey aims to record your experiences while solving tasks under
-    different circumstances. Therefore, existing experiences and
-    socio-demographic characteristics are collected. This serves the purpose of
-    discovering the challenges of learning and creating improved learning
-    opportunities. The survey will take about 1 hour to complete.
-    All participants will be rewarded with 15€ each.
+    This survey aims to investigate the influence of personal characteristics and the design of the digital learning environment on learning outcomes.
+    As part of this study, we will collect socio-demographic data and learning relevant factors.
+    The results of this study will be used to improve learning experiences and outcomes in digital learning environments.
+    The survey will take about 1 hour to complete. Participants will be rewarded with 15€.
   </p>
   <p>
     This survey is targeted exclusively at university students over the ages of 18 and over.
@@ -37,19 +35,19 @@
 
   <div class="flex justify-between gap-x-4">
     <div class="p-6 w-1/2 bg-base-100 rounded-xl">
+      <p><b>2) Institute for Educational Science</b></p>
+      <p>Department of Teaching and Learning with Intelligent Systems (LLiS)</p>
+      <p>Geschwister-Scholl-Str. 24D</p>
+      <p>Robin Gebert</p>
+      <p><span class="text-accent">st180554@stud.uni-stuttgart.de</span></p>
+    </div>
+    <div class="p-6 w-1/2 bg-base-100 rounded-xl">
       <p><b>1) Institute for Educational Science</b></p>
       <p>Department of Teaching and Learning with Intelligent Systems (LLiS)</p>
       <p>Geschwister-Scholl-Str. 24D</p>
       <p>Prof. Dr. Maria Wirzberger</p>
       <p>+49 (0)711/685- 81176</p>
       <p><span class="text-accent">maria.wirzberger@iris.uni-stuttgart.de</span></p>
-    </div>
-    <div class="p-6 w-1/2 bg-base-100 rounded-xl">
-      <p><b>2) Institute for Educational Science</b></p>
-      <p>Department of Teaching and Learning with Intelligent Systems (LLiS)</p>
-      <p>Geschwister-Scholl-Str. 24D</p>
-      <p>Robin Gebert</p>
-      <p><span class="text-accent">st180554@stud.uni-stuttgart.de</span></p>
     </div>
   </div>
   <div class="p-6 w-full bg-base-100 rounded-xl">
@@ -81,10 +79,8 @@
   </p>
   <h5>3. Purpose of the survey and data collected</h5>
   <p>
-    The survey aims to record the experiences of students and doctoral
-    candidates in acquiring competencies in the field of machine learning.
-    Therefore, existing experiences and socio-demographic characteristics are
-    collected. The survey takes about 1 hour.
+    This survey aims to investigate the influence of personal characteristics and the design of the digital learning environment on learning outcomes.
+    Therefore, existing experiences and socio-demographic characteristics are collected. The survey takes about 1 hour.
   </p>
   <h5>4. Documentation and publication</h5>
   <p>
@@ -113,7 +109,7 @@
   </p>
   <h5>8. Rights of subjects</h5>
   <p>You have the right:</p>
-  <ul>
+  <ul class="list-inside list-disc">
     <li>
       In accordance with Art. 7 para. 3 GDPR, to withdraw your consent once
       given to us at any time. As a result, we may no longer continue the data

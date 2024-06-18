@@ -64,15 +64,15 @@
       {#if areBadgesEnabled}
         <div class="stat">
           <div class="stat-title">Badges</div>
-          <div class="stat-value text-secondary">{badgeCount}</div>
+          <div class="stat-value text-primary">{badgeCount}</div>
           <div class="stat-desc">badges unlocked</div>
         </div>
       {/if}
       {#if isLeaderboardEnabled}
         <div class="stat">
           <div class="stat-title">You placed</div>
-          <div class="stat-value">{leaderboardPlace}</div>
-          <div class="stat-desc text-secondary">on the Leaderboard</div>
+          <div class="stat-value text-primary">{leaderboardPlace}</div>
+          <div class="stat-desc">on the leaderboard</div>
         </div>
       {/if}
     </div>

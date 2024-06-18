@@ -26,7 +26,9 @@
         },
     ];
 
-    export const unlockedBadgesCount = badges.filter(badge => badge.unlocked).length;
+    export function unlockedBadgesCount() {
+        return badges.filter((badge) => badge.unlocked).length;
+    }
 
     export function unlockBadge(id: number) {
         badges = badges.map((badge) => {
@@ -39,8 +41,8 @@
 </script>
 
 <div class="w-1/2 bg-base-200 p-4 rounded-xl shadow-md">
-    <p class="stat-title mb-2">Badges</p>
-    <div class="grid grid-cols-2 gap-4">
+    <p class="stat-title mb-6">Badges</p>
+    <div class="grid grid-cols-2 grid-rows-2 gap-12">
         {#each badges as badge}
             <div class="tooltip" data-tip={badge.tooltip}>
                 <div class="flex justify-center">
@@ -52,8 +54,8 @@
                             : 'grayscale'}"
                     />
                 </div>
+                <p class="stat-desc">{badge.tooltip}</p>
             </div>
         {/each}
-        <div class="stat-desc">Hover a badge to see its requirements</div>
     </div>
 </div>

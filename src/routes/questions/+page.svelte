@@ -33,6 +33,7 @@
     let narratedRef: NarratedContent;
     let badgesRef: Badges;
     let scoreModalRef: ScoreModal;
+    let isUIEnabled = writable(true);
 
     let isAvatarEnabled = false;
     let arePointsEnabled = false;
@@ -78,10 +79,10 @@
         "D",
         "B",
         "A",
-        "C", //20
-        "D",
+        "B", //20
+        "C",
         "A",
-        "B",
+        "C",
         "D",
         "A",
         "A",
@@ -98,20 +99,20 @@
         "B",
         "A",
         "B",
-        "E", //40
+        "B", //40
         "B",
-        "C",
-        "C",
-        "E",
+        "D",
         "C",
         "E",
+        "C",
+        "B",
         "C",
         "E",
         "C",
         "B", //50
         "D",
         "B",
-        "C",
+        "A",
         "C",
         "D",
         "A",
@@ -133,16 +134,14 @@
         toastRef.showToast(isSuccess, message);
     }
 
-    const handleAnswer = (answer: string) => {
-        if (narratedRef !== undefined) {
-            narratedRef.hideNarration();
-        }
+    const handleAnswer = async (answer: string) => {
+        isUIEnabled.set(false);
         const endTime = Date.now();
         const timeTaken = endTime - questionStartTime;
         answerTime.update((times) => [...times, timeTaken]);
-        // Antworten speichern
+        // Save the answers
         if (correctAnswers[get(currentQuestionIndex)] === answer) {
-            score.update((n) => n + 5);
+            score.update((n) => n + 1);
             userAnswers.update((answers) => [...answers, true]);
             showToast(true);
             if (narratedRef !== undefined) {
@@ -163,12 +162,41 @@
                 );
             }
         }
+        await preloadNextQuestionImage();
+        await waitForNextQuestion();
         currentQuestionIndex.update((n) => n + 1);
+        if (narratedRef !== undefined) {
+            narratedRef.hideNarration();
+        }
+        isUIEnabled.set(true);
+    };
+
+    const waitForNextQuestion = () => {
+        return new Promise((resolve) => {
+            if (narratedRef !== undefined && narratedRef.isShowing()) {
+                setTimeout(() => resolve(true), 5000);
+            } else {
+                setTimeout(() => resolve(true), 2000);
+            }
+        });
+    };
+
+    const preloadNextQuestionImage = () => {
+        return new Promise((resolve) => {
+            const nextIndex = get(currentQuestionIndex) + 1;
+            if (nextIndex < totalQuestions) {
+                const nextImage = new Image();
+                nextImage.src = `/img/questions/q-${nextIndex}.png`;
+                nextImage.onload = () => resolve(true);
+            } else {
+                resolve(true);
+            }
+        });
     };
 
     score.subscribe((value) => {
         if (badgesRef !== undefined) {
-            switch (value / 5) {
+            switch (value) {
                 case 1:
                     badgesRef.unlockBadge(1);
                     break;
@@ -192,7 +220,7 @@
         } else {
             scoreModalRef.setScore(get(score));
             if (areBadgesEnabled) {
-                scoreModalRef.setBadgeCount(badgesRef.unlockedBadgesCount);
+                scoreModalRef.setBadgeCount(badgesRef.unlockedBadgesCount());
             }
             scoreModalRef.setLeaderboardPlace(
                 sortedLeaderboard.findIndex((player) => player.isYou) + 1,
@@ -234,93 +262,106 @@
     <!-- Scoreboard -->
     <div class="w-1/4 mx-auto">
         {#if isLeaderboardEnabled}
-        <div class="bg-base-200 shadow-md rounded-xl p-6">
-            <span class="text-primary stat-value"><b>Leaderboard</b></span>
-            <table
-                class="table w-full table-auto mt-10"
-            >
-                <thead class="my-10">
-                    <tr class="my-10">
-                        <th class="w-1/4">Rank</th>
-                        {#if isAvatarEnabled}<th class="w-1/4">Profile</th>
-                        {/if}
-                        {#if arePointsEnabled}<th class="w-2/4 text-center"
-                                >Score</th
-                            >
-                        {/if}
-                    </tr>
-                </thead>
-                <tbody>
-                    {#each sortedLeaderboard as player, index}
-                        <tr
-                            class={player.isYou ? "bg-base-300" : "bg-base-200"}
-                        >
-                            <td class="text-center text-lg">{index + 1}</td>
-                            {#if isAvatarEnabled}
-                                <td class="flex justify-center items-center">
-                                    <img
-                                        src={player.profilePic}
-                                        alt="profile"
-                                        class="w-20 h-20 rounded-full"
-                                    />
-                                </td>
+            <div class="bg-base-200 shadow-md rounded-xl p-6">
+                <span class="text-primary stat-value"><b>Leaderboard</b></span>
+                <table class="table w-full table-auto mt-10">
+                    <thead class="my-10">
+                        <tr class="my-10">
+                            <th class="w-1/4">Rank</th>
+                            {#if isAvatarEnabled}<th class="w-1/4">Profile</th>
                             {/if}
-                            {#if arePointsEnabled}<td
-                                    class="text-center text-lg"
-                                    >{player.score}</td
-                                >{/if}
+                            {#if arePointsEnabled}<th class="w-2/4 text-center"
+                                    >Score</th
+                                >
+                            {/if}
                         </tr>
-                    {/each}
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody>
+                        {#each sortedLeaderboard as player, index}
+                            <tr
+                                class={player.isYou
+                                    ? "bg-base-300"
+                                    : "bg-base-200"}
+                            >
+                                <td class="text-center text-lg">{index + 1}</td>
+                                {#if isAvatarEnabled}
+                                    <td
+                                        class="flex justify-center items-center"
+                                    >
+                                        <img
+                                            src={player.profilePic}
+                                            alt="profile"
+                                            class="w-20 h-20 rounded-full"
+                                        />
+                                    </td>
+                                {/if}
+                                {#if arePointsEnabled}<td
+                                        class="text-center text-lg"
+                                        >{player.score}</td
+                                    >{/if}
+                            </tr>
+                        {/each}
+                    </tbody>
+                </table>
+            </div>
         {/if}
     </div>
     <!-- Question Board -->
-    <div class="p-6 w-1/2 mx-10 bg-base-200 rounded-xl shadow-md">
-        {#if !areQuestionsFinished}
-            <p class="text-xl">Answer the following question</p>
-            <p class="text-m mb-20">Choose the option that best fits to replace the question mark</p>
-            <div class="flex justify-between items-center">
-                <div class="flex flex-col items-center">
-                    <img
-                        src={questionImage}
-                        alt="Question"
-                        class="w-3/4 h-3/4"
-                        on:load={handleImageLoad}
-                    />
-                    <div class="flex mt-4 space-x-4">
-                        <button
-                            class="btn btn-primary"
-                            on:click={() => handleAnswer("A")}>Option A</button
-                        >
-                        <button
-                            class="btn btn-primary"
-                            on:click={() => handleAnswer("B")}>Option B</button
-                        >
-                        <button
-                            class="btn btn-primary"
-                            on:click={() => handleAnswer("C")}>Option C</button
-                        >
-                        <button
-                            class="btn btn-primary"
-                            on:click={() => handleAnswer("D")}>Option D</button
-                        >
-                        <button
-                            class="btn btn-primary"
-                            on:click={() => handleAnswer("E")}>Option E</button
-                        >
+    <div
+        class="p-6 w-1/2 mx-10 bg-base-200 rounded-xl shadow-md">
+        <div class="{$isUIEnabled ? '' : 'grayscale brightness-50 pointer-events-none'}">
+            {#if !areQuestionsFinished}
+                <p class="text-xl">Answer the following question</p>
+                <p class="text-m mb-20">
+                    Choose the option that best fits to replace the question
+                    mark
+                </p>
+                <div class="flex justify-between items-center">
+                    <div class="flex flex-col items-center">
+                        <img
+                            src={questionImage}
+                            alt="Question"
+                            class="w-3/4 h-3/4"
+                            on:load={handleImageLoad}
+                        />
+                        <div class="flex mt-4 space-x-4">
+                            <button
+                                class="btn btn-primary"
+                                on:click={() => handleAnswer("A")}
+                                disabled={!$isUIEnabled}>Option A</button
+                            >
+                            <button
+                                class="btn btn-primary"
+                                on:click={() => handleAnswer("B")}
+                                disabled={!$isUIEnabled}>Option B</button
+                            >
+                            <button
+                                class="btn btn-primary"
+                                on:click={() => handleAnswer("C")}
+                                disabled={!$isUIEnabled}>Option C</button
+                            >
+                            <button
+                                class="btn btn-primary"
+                                on:click={() => handleAnswer("D")}
+                                disabled={!$isUIEnabled}>Option D</button
+                            >
+                            <button
+                                class="btn btn-primary"
+                                on:click={() => handleAnswer("E")}
+                                disabled={!$isUIEnabled}>Option E</button
+                            >
+                        </div>
                     </div>
                 </div>
-            </div>
-        {/if}
-        {#if areQuestionsFinished}
-            <div class="flex justify-center items-center h-64">
-                <a class="btn btn-primary mx-auto" href="/stai">
-                    Proceed to next page
-                </a>
-            </div>
-        {/if}
+            {/if}
+            {#if areQuestionsFinished}
+                <div class="flex justify-center items-center h-64">
+                    <a class="btn btn-primary mx-auto" href="/stai">
+                        Proceed to next page
+                    </a>
+                </div>
+            {/if}
+        </div>
         <Toast bind:this={toastRef} />
     </div>
     <!-- Scores and Badges -->
@@ -329,7 +370,7 @@
             <div class="w-1/2 stat bg-base-200 mb-10 p-4 rounded-xl shadow-md">
                 <div class="stat-title">Score</div>
                 <div class="stat-value text-primary">{$score}</div>
-                <div class="stat-desc">5 points per question</div>
+                <div class="stat-desc">1 point per question</div>
             </div>
         {/if}
         {#if areBadgesEnabled}
@@ -337,3 +378,10 @@
         {/if}
     </div>
 </div>
+
+<style>
+    .disabled {
+        filter: grayscale(100%);
+        pointer-events: none;
+    }
+</style>

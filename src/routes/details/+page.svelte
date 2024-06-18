@@ -15,12 +15,11 @@
   let loading = false;
 
   const descriptions = [
-    "Erster Buchstabe der Grundschule",
-    "Letzte zwei Ziffern der Telefonnummer",
-    "Letzter Buchstabe des Geburtsorts",
-    "Tag des Geburtsdatums",
-    "Letzte Ziffer der Postleitzahl",
-    "Zweiter Buchstabe des Vornamens eines Elternteils",
+    "Letzter Buchstabe des Vornames des Vaters",
+    "Letzte Zahl des Tages des Geburtstags",
+    "Erster Buchstabe des Vornames der Mutter",
+    "Monat des Geburtstags des Vaters (01-12)",
+    "Letzte Ziffer der PLZ",
   ];
 
   let deletionCodeStrings = {
@@ -29,7 +28,6 @@
     field3: "",
     field4: "",
     field5: "",
-    field6: "",
   };
 
   const studyPrograms = [
@@ -198,15 +196,20 @@
     }
   }
 
+  let userType = "";
+
   const handleSubmit = async (event: Event) => {
     event.preventDefault();
     errorMessage = "";
 
-    if (!gender || !age || !studyProgram || Object.values(deletionCodeStrings).some(value => value === "")) {
+    if (!gender || !age || !userType || (userType === "student" && !studyProgram) || Object.values(deletionCodeStrings).some(value => value === "")) {
       errorMessage = "Please fill out all fields.";
       return;
     }
+
     const deletionCode = Object.values(deletionCodeStrings).join("").toUpperCase();
+    const finalStudyProgram = userType === "student" ? studyProgram : userType;
+
     console.log(deletionCode);
     loading = true;
     try {
@@ -215,7 +218,7 @@
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ gender, age, studyProgram, deletionCode }),
+        body: JSON.stringify({ gender, age, studyProgram: finalStudyProgram, deletionCode }),
       });
 
       const data = await response.json();
@@ -281,15 +284,37 @@
 
     <div class="form-control">
       <label class="label">
-        <span class="label-text">Study Program</span>
+        <span class="label-text">User Type</span>
       </label>
-      <select bind:value={studyProgram} class="select select-bordered">
-        <option value="" disabled selected>Select your study program</option>
-        {#each studyPrograms as program}
-          <option value={program}>{program}</option>
-        {/each}
-      </select>
+      <div class="flex space-x-6 m-2">
+        <label class="flex items-center space-x-2">
+          <input type="radio" bind:group={userType} value="student" class="radio radio-primary" />
+          <span>Student</span>
+        </label>
+        <label class="flex items-center space-x-2">
+          <input type="radio" bind:group={userType} value="PhD student" class="radio radio-primary" />
+          <span>PhD Student</span>
+        </label>
+        <label class="flex items-center space-x-2">
+          <input type="radio" bind:group={userType} value="Employee of the university" class="radio radio-primary" />
+          <span>Employee of the University</span>
+        </label>
+      </div>
     </div>
+
+    {#if userType === 'student'}
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text">Study Program</span>
+        </label>
+        <select bind:value={studyProgram} class="select select-bordered">
+          <option value="" disabled selected>Select your study program</option>
+          {#each studyPrograms as program}
+            <option value={program}>{program}</option>
+          {/each}
+        </select>
+      </div>
+    {/if}
 
     <div class="form-control">
       <label class="label">
@@ -311,7 +336,7 @@
           type="text"
           name="field2"
           class="input w-20 input-bordered join-item"
-          maxlength="2"
+          maxlength="1"
           on:focus={() => showDescription(1)}
           on:input={(event) => handleInput(event, 'field3')}
           bind:value={deletionCodeStrings.field2}
@@ -345,16 +370,6 @@
           on:focus={() => showDescription(4)}
           on:input={(event) => handleInput(event, 'field6')}
           bind:value={deletionCodeStrings.field5}
-        />
-        <input
-          id="field6"
-          type="text"
-          name="field6"
-          class="input w-20 input-bordered join-item"
-          maxlength="1"
-          on:focus={() => showDescription(5)}
-          on:input={(event) => handleInput(event, 'field6')}
-          bind:value={deletionCodeStrings.field6}
         />
       </div>
       <div class="description mt-1 text-gray-600 text-xs">{currentDescription}</div>

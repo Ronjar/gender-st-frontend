@@ -18,6 +18,7 @@
   let loading = false;
   let apiResponse: number;
   let buttonVisiblility = writable(false);
+  let uploadFinished = writable(false);
   let round: number;
   wRound.subscribe((value) => {
     round = value;
@@ -62,6 +63,7 @@
       }
 
       const data = await response.json();
+      uploadFinished.set(true);
       if (data.round > 0 || data.round < 3) {
         wRound.set(data.round);
         buttonVisiblility.set(true);
@@ -91,11 +93,13 @@
 
 <div class="p-6 max-w-4xl mx-auto bg-base-200 rounded-xl shadow-md space-y-4">
   <h1>{getTitle()}</h1>
-  {#if !$buttonVisiblility}
+  {#if !$uploadFinished}
     <p>Results are submitted any moment...</p>
   {/if}
+  {#if $uploadFinished}
+  <p>Results are submitted</p>
+  {/if}
   {#if $buttonVisiblility}
-    <p>Results are submitted</p>
     <button
       class="btn btn-primary mt-5 {loading ? 'loading' : ''}"
       on:click={finishSurvey}

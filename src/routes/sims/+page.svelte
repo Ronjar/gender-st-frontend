@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { sims} from "../../store";
+    import { sims } from "../../store";
     import { goto } from "$app/navigation";
     import Toast from "$lib/components/FormToast.svelte";
 
@@ -39,7 +39,7 @@
         loading = true;
         try {
             // Implement your logic for storing answers or navigating
-            sims.set(answers)
+            sims.set(answers);
             goto("/submission");
         } catch (error) {
             errorMessage = "An error occurred. Please try again.";
@@ -49,27 +49,30 @@
     };
 </script>
 
-<div class="p-6 max-w-4xl mx-auto bg-base-200 rounded-xl shadow-md space-y-4">
-    <h1 class="text-2xl font-bold mb-6">Why are you currently engaged in this activity?</h1>
-    <form on:submit={handleSubmit} class="space-y-6 w-full max-w-4xl">
+<div class="p-6 max-w-6xl mx-auto bg-base-200 rounded-xl shadow-md space-y-4">
+    <h1 class="text-2xl font-bold mb-6">
+        Why are you currently engaged in this activity?
+    </h1>
+    <form on:submit={handleSubmit} class="space-y-6 w-full max-w-6xl">
         <div role="alert" class="alert bg-base-300">
             <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              class="stroke-info shrink-0 w-6 h-6"
-              ><path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              ></path></svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                class="stroke-info shrink-0 w-6 h-6"
+                ><path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path></svg
             >
             <span
-              >Evaluate yourself using the following questions. Take your time and
-              answer each question honestly and to the best of your knowledge.</span
+                >Evaluate yourself using the following questions. Take your time
+                and answer each question honestly and to the best of your
+                knowledge.</span
             >
-          </div>
+        </div>
 
         {#each questions as question, index}
             <div class="card bg-base-300 p-4 rounded-lg shadow-md">
@@ -80,6 +83,71 @@
                         >
                     </label>
                     <div class="flex space-x-4 items-center">
+                        <label class="flex items-center space-x-2">
+                            <input
+                                type="radio"
+                                bind:group={answers[index]}
+                                value="1"
+                                class="radio radio-primary"
+                            />
+                            <span class="ml-1">corresponds not all</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input
+                                type="radio"
+                                bind:group={answers[index]}
+                                value="2"
+                                class="radio radio-primary"
+                            />
+                            <span class="ml-1">corresponds a very little</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input
+                                type="radio"
+                                bind:group={answers[index]}
+                                value="3"
+                                class="radio radio-primary"
+                            />
+                            <span class="ml-1">corresponds a little</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input
+                                type="radio"
+                                bind:group={answers[index]}
+                                value="4"
+                                class="radio radio-primary"
+                            />
+                            <span class="ml-1">corresponds moderatly</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input
+                                type="radio"
+                                bind:group={answers[index]}
+                                value="5"
+                                class="radio radio-primary"
+                            />
+                            <span class="ml-1">corresponds enough</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input
+                                type="radio"
+                                bind:group={answers[index]}
+                                value="6"
+                                class="radio radio-primary"
+                            />
+                            <span class="ml-1">corresponds a lot</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input
+                                type="radio"
+                                bind:group={answers[index]}
+                                value="7"
+                                class="radio radio-primary"
+                            />
+                            <span class="ml-1">corresponds exactly</span>
+                        </label>
+                    </div>
+                    <!--<div class="flex space-x-4 items-center">
                         {#each Array(7).fill(null) as _, i}
                             <label class="flex items-center space-x-2">
                                 <input
@@ -91,7 +159,7 @@
                                 <span>{i + 1}</span>
                             </label>
                         {/each}
-                    </div>
+                    </div>-->
                 </div>
             </div>
         {/each}
@@ -112,21 +180,21 @@
 
 <style>
     .loading-spinner {
-      border: 2px solid transparent;
-      border-radius: 50%;
-      border-top: 2px solid white;
-      border-right: 2px solid white;
-      width: 1em;
-      height: 1em;
-      animation: spin 1s linear infinite;
+        border: 2px solid transparent;
+        border-radius: 50%;
+        border-top: 2px solid white;
+        border-right: 2px solid white;
+        width: 1em;
+        height: 1em;
+        animation: spin 1s linear infinite;
     }
-  
+
     @keyframes spin {
-      0% {
-        transform: rotate(0deg);
-      }
-      100% {
-        transform: rotate(360deg);
-      }
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
     }
-  </style>
+</style>
