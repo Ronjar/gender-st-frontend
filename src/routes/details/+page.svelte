@@ -295,10 +295,6 @@
           <input type="radio" bind:group={userType} value="PhD student" class="radio radio-primary" />
           <span>PhD Student</span>
         </label>
-        <label class="flex items-center space-x-2">
-          <input type="radio" bind:group={userType} value="Employee of the university" class="radio radio-primary" />
-          <span>Employee of the University</span>
-        </label>
       </div>
     </div>
 
@@ -372,7 +368,7 @@
           bind:value={deletionCodeStrings.field5}
         />
       </div>
-      <div class="description mt-1 text-gray-600 text-xs">{currentDescription}</div>
+      <div class="description mt-1 text-gray-400 text-s">{currentDescription}</div>
     </div>
 
     <div class="form-control mt-6">
