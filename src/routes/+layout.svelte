@@ -1,15 +1,11 @@
 <script>
     import "../app.css";
-    import { isAvatarEnabled, avatarPath as storeAvatarPath } from "../store";
-    import { get } from "svelte/store";
+    import { avatarPath as storeAvatarPath } from "../store";
 
     export const ssr = false;
 
     let avatarEnabled = false;
     let avatarPath = "";
-    isAvatarEnabled.subscribe((value) => {
-        avatarEnabled = value;
-    });
     storeAvatarPath.subscribe((value) => {
         avatarPath = value;
     });
@@ -22,7 +18,7 @@
             <div class="flex-1">
                 <img src="/img/uni_logo.png" class="h-20 m-2" alt="Icon of the University of Stuttgart"/>
             </div>
-            {#if avatarEnabled}
+            {#if avatarPath}
                 <div class="flex-none">
                     <div class="avatar">
                         <div class="w-20 m-2 rounded-full">

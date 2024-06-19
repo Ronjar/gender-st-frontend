@@ -1,8 +1,8 @@
 <script lang="ts">
   import {
     gamifiedElements,
+    round,
     userId,
-    isAvatarEnabled as waIsAvatarEnabled,
   } from "../../store";
   import { goto } from "$app/navigation";
   import { get } from "svelte/store";
@@ -183,9 +183,6 @@
   }
 
   let isAvatarEnabled = false;
-  waIsAvatarEnabled.subscribe((value) => {
-    isAvatarEnabled = value;
-  });
 
   function handleInput(event: any, nextFieldId: string) {
     if (event.target.value.length === event.target.maxLength) {
@@ -210,7 +207,6 @@
     const deletionCode = Object.values(deletionCodeStrings).join("").toUpperCase();
     const finalStudyProgram = userType === "student" ? studyProgram : userType;
 
-    console.log(deletionCode);
     loading = true;
     try {
       const response = await fetch(`${BASE_URL}/adduser`, {
@@ -228,8 +224,7 @@
         // Assuming the server returns an ID in the format { id: 'unique-identifier' }
         gamifiedElements.set(data.gamifiedElements);
         userId.set(data.userId);
-        console.log("userId: " + get(userId));
-        if (isAvatarEnabled) {
+        if (data.gamifiedElements[0].includes('a')) {
           goto("/avatars");
         } else {
           goto("/questions");
