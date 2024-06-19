@@ -77,7 +77,7 @@
     if (round < 2) {
       return `End of study part ${round + 1}`;
     } else {
-      return "End of study, tank you for your participation";
+      return "End of study, thank you for your participation";
     }
   }
 
@@ -92,15 +92,17 @@
 
 <div class="p-6 max-w-4xl mx-auto bg-base-200 rounded-xl shadow-md space-y-4">
   <h1>{getTitle()}</h1>
+  {#if round < 2}
   <p>
     You have completed round {round + 1} of the study. Thank you very much so far!
   </p>
+  {/if}
   {#if !$uploadFinished}
     <p>Results are submitted any moment...</p>
   {/if}
   {#if $uploadFinished}
     <p>Results have been submitted.</p>
-    {#if $wRound > 2}
+    {#if round >= 2}
       <p>
         Thank you for participating in this test. Show this screen to the
         supervising person

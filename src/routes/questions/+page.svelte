@@ -21,6 +21,7 @@
         randomGoodPhrase,
     } from "$lib/scripts/narratedPhrases";
     import Badges from "./Badges.svelte";
+    import { getRandomLeaderboardNumber } from "$lib/scripts/leaderboardNumberGenerator";
 
     const totalQuestions = 20;
     let currentQuestionIndex = writable(0 + get(roundBasedPadding));
@@ -120,12 +121,23 @@
         "D",
     ];
 
+    // Function to get a random avatar
+    function getRandomAvatar(usedAvatars: Set<number>): string {
+        let avatarIndex;
+        do {
+            avatarIndex = 1 + Math.floor(Math.random() * 8); // Since we have avatar0 to avatar8
+        } while (usedAvatars.has(avatarIndex));
+        usedAvatars.add(avatarIndex);
+        return `/img/npc/avatar${avatarIndex}.png`;
+    }
+
+    let usedAvatars = new Set<number>();
     let opponents = [
-        { score: 77, profilePic: "/img/npc/avatar1.png", isYou: false },
-        { score: 69, profilePic: "/img/npc/avatar2.png", isYou: false },
-        { score: 42, profilePic: "/img/npc/avatar3.png", isYou: false },
-        { score: 33, profilePic: "/img/npc/avatar4.png", isYou: false },
-        { score: 21, profilePic: "/img/npc/avatar5.png", isYou: false },
+        { score: getRandomLeaderboardNumber(16), profilePic: getRandomAvatar(usedAvatars), isYou: false },
+        { score: getRandomLeaderboardNumber(13), profilePic: getRandomAvatar(usedAvatars), isYou: false },
+        { score: getRandomLeaderboardNumber(10), profilePic: getRandomAvatar(usedAvatars), isYou: false },
+        { score: getRandomLeaderboardNumber(7), profilePic: getRandomAvatar(usedAvatars), isYou: false },
+        { score: getRandomLeaderboardNumber(4), profilePic: getRandomAvatar(usedAvatars), isYou: false },
     ];
 
     function showToast(isSuccess: boolean) {
@@ -145,7 +157,7 @@
             showToast(true);
             if (narratedRef !== undefined) {
                 callWithProbability(
-                    0.4,
+                    0.2,
                     narratedRef.showNarration,
                     randomGoodPhrase(),
                 );
@@ -155,7 +167,7 @@
             showToast(false);
             if (narratedRef !== undefined) {
                 callWithProbability(
-                    0.4,
+                    0.2,
                     narratedRef.showNarration,
                     randomBadPhrase(),
                 );
