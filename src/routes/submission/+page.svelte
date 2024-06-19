@@ -40,7 +40,6 @@
     //const answerTime = [1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000,];
     //const gamifiedElements = "pblan";
 
-
     try {
       const response = await fetch(`${BASE_URL}/addset`, {
         method: "POST",
@@ -76,7 +75,7 @@
 
   function getTitle() {
     if (round < 2) {
-      return `End of study part ${round+1}`;
+      return `End of study part ${round + 1}`;
     } else {
       return "End of study, tank you for your participation";
     }
@@ -93,13 +92,23 @@
 
 <div class="p-6 max-w-4xl mx-auto bg-base-200 rounded-xl shadow-md space-y-4">
   <h1>{getTitle()}</h1>
+  <p>
+    You have completed round {round + 1} of the study. Thank you very much so far!
+  </p>
   {#if !$uploadFinished}
     <p>Results are submitted any moment...</p>
   {/if}
   {#if $uploadFinished}
-  <p>Results are submitted</p>
+    <p>Results have been submitted.</p>
+    {#if $wRound > 2}
+      <p>
+        Thank you for participating in this test. Show this screen to the
+        supervising person
+      </p>
+    {/if}
   {/if}
   {#if $buttonVisiblility}
+    <p>To proceed in the study, please press the button below.</p>
     <button
       class="btn btn-primary mt-5 {loading ? 'loading' : ''}"
       on:click={finishSurvey}

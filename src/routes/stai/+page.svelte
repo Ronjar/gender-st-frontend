@@ -40,7 +40,6 @@
 </script>
 
 <div class="p-6 max-w-4xl mx-auto bg-base-200 rounded-xl shadow-md space-y-4">
-  <h1 class="text-2xl font-bold mb-6">STAI</h1>
   <form on:submit={handleSubmit} class="space-y-6 w-full max-w-4xl">
     <div role="alert" class="alert bg-base-300">
       <svg

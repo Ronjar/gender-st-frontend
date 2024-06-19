@@ -1,6 +1,5 @@
 <script lang="ts">
     import { writable, get, derived } from "svelte/store";
-    import { goto } from "$app/navigation";
     import {
         questions as waQuestions,
         answerTime as waAnswerTime,
@@ -40,7 +39,7 @@
     let isLeaderboardEnabled = false;
     let isNarratedContentEnabled = false;
     let areBadgesEnabled = false;
-    let areQuestionsFinished = false;
+    let areQuestionsFinished = true;
 
     waAvatars.subscribe((value) => {
         isAvatarEnabled = value;
@@ -307,9 +306,12 @@
         {/if}
     </div>
     <!-- Question Board -->
-    <div
-        class="p-6 w-1/2 mx-10 bg-base-200 rounded-xl shadow-md">
-        <div class="{$isUIEnabled ? '' : 'grayscale brightness-50 pointer-events-none'}">
+    <div class="p-6 w-1/2 mx-10 bg-base-200 rounded-xl shadow-md">
+        <div
+            class={$isUIEnabled
+                ? ""
+                : "grayscale brightness-50 pointer-events-none"}
+        >
             {#if !areQuestionsFinished}
                 <p class="text-xl">Answer the following question</p>
                 <p class="text-m mb-20">
@@ -356,9 +358,16 @@
             {/if}
             {#if areQuestionsFinished}
                 <div class="flex justify-center items-center h-64">
-                    <a class="btn btn-primary mx-auto" href="/stai">
-                        Proceed to next page
-                    </a>
+                    <div class="mx-auto">
+                        <h2>
+                            Thank you for completing this round of logic
+                            puzzles!<br> Now, we have some questions for you. To
+                            proceed, please press the button below.
+                        </h2>
+                        <a class="btn btn-primary mt-10 w-full" href="/stai">
+                            Proceed to questions
+                        </a>
+                    </div>
                 </div>
             {/if}
         </div>
