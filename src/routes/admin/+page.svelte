@@ -17,7 +17,7 @@
 
   let errorMessage = "";
   let loading = false;
-  let isAuthenticated = true;
+  let isAuthenticated = false;
   let password = "";
 
   const hardcodedPassword = "enpro23"; // hardcoded password
@@ -29,7 +29,6 @@
       const data = await response.json();
 
       if (response.ok) {
-        console.log(data);
         usersCount = data.users;
         datasetCounts = {
           _: data.dataSets.x,

@@ -39,7 +39,7 @@
     let isLeaderboardEnabled = false;
     let isNarratedContentEnabled = false;
     let areBadgesEnabled = false;
-    let areQuestionsFinished = true;
+    let areQuestionsFinished = false;
 
     waAvatars.subscribe((value) => {
         isAvatarEnabled = value;
