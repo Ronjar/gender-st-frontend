@@ -1,13 +1,9 @@
-<script>
-  import { goto } from "$app/navigation";
-
-  const navigateToPersonalData = () => {
-    goto("/details");
-  };
-</script>
-
 <div class="p-6 max-w-4xl mx-auto bg-base-200 rounded-xl shadow-md space-y-4">
   <h1>Welcome to our survey!</h1>
+  <div role="alert" class="alert alert-warning">
+    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+    <span>Even if the test performs slow, never refresh via the browser controls</span>
+  </div>
   <p>
     This survey aims to investigate the influence of personal characteristics and the design of a digital learning environment on learning outcomes. 
     It is conducted by Robin Gebert (<span class="text-accent">st180554@stud.uni-stuttgart.de</span>) and jointly supervised by M. Sc. Nadine Koch (<span class="text-accent">nadine.koch@iste.uni-stuttgart.de</span>), 
@@ -16,7 +12,7 @@
   <p>
     As part of this study, we will collect socio-demographic information, data related to the tasks you will perform (e.g., response times, error rates), as well as information on your personal opinions, characteristics, and attitudes. 
     The results of this study will be used to improve learning experiences and outcomes in future digital learning environments. Completing the survey will take about 1 hour and be compensated with 15€. 
-    Participation in this study is voluntary and open to anyone aged 18 and beyond.
+    Participation in this study is voluntary and open to anyone age 18 and above.
   </p>
   <p>
     If you decide to participate, you can terminate your participation at any time. The data collected up to that point will then be deleted. Once the questionnaire has been completed, your data is stored anonymously and can no longer be traced back to your person. 

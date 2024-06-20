@@ -46,9 +46,23 @@
   onMount(() => {
     modal = document.getElementById("score_modal");
   });
+
+  function ordinalSuffix(num: number): string {
+    const j = num % 10,
+          k = num % 100;
+    if (j == 1 && k != 11) {
+      return num + "st";
+    }
+    if (j == 2 && k != 12) {
+      return num + "nd";
+    }
+    if (j == 3 && k != 13) {
+      return num + "rd";
+    }
+    return num + "th";
+  }
 </script>
 
-<!-- Open the modal using ID.showModal() method -->
 <dialog id="score_modal" class="modal">
   <div class="modal-box max-w-2xl">
     <h3 class="font-bold text-lg">You finished this rounds questions</h3>
@@ -71,7 +85,7 @@
       {#if isLeaderboardEnabled}
         <div class="stat">
           <div class="stat-title">You placed</div>
-          <div class="stat-value text-primary">{leaderboardPlace}</div>
+          <div class="stat-value text-primary">{ordinalSuffix(leaderboardPlace)}</div>
           <div class="stat-desc">on the leaderboard</div>
         </div>
       {/if}

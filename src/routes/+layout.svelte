@@ -1,5 +1,8 @@
 <script>
     import "../app.css";
+    import unsaveddialog from "$lib/scripts/unsaveddialog";
+    import { onMount } from "svelte";
+    const { action } = unsaveddialog();
     import { avatarPath as storeAvatarPath } from "../store";
 
     export const ssr = false;
@@ -9,6 +12,13 @@
     storeAvatarPath.subscribe((value) => {
         avatarPath = value;
     });
+    onMount( async() => {
+        window.addEventListener('beforeunload', e => {
+		e.preventDefault()
+		return e.returnValue = "Are you sure you want to exit?";
+	});
+    })
+
 </script>
 
 <div class="min-h-screen">

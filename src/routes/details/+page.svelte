@@ -11,15 +11,16 @@
   let gender = "";
   let age = "";
   let studyProgram = "";
+  let phdStudyProgram = "";
   let errorMessage = "";
   let loading = false;
 
   const descriptions = [
-    "Letzter Buchstabe des Vornames des Vaters",
-    "Letzte Zahl des Tages des Geburtstags",
-    "Erster Buchstabe des Vornames der Mutter",
-    "Monat des Geburtstags des Vaters (01-12)",
-    "Letzte Ziffer der PLZ",
+    "Last letter of the father's first name",
+    "Last number of the birthday",
+    "First letter of the mother's first name",
+    "Month of the father's birthday (01-12)",
+    "Last digit of postcode",
   ];
 
   let deletionCodeStrings = {
@@ -182,10 +183,25 @@
     currentDescription = descriptions[field];
   }
 
-  let isAvatarEnabled = false;
-
   function handleInput(event: any, nextFieldId: string) {
-    if (event.target.value.length === event.target.maxLength) {
+    const input = event.target;
+
+    if (input.id === 'field1' || input.id === 'field3') {
+      input.value = input.value.replace(/[^a-zA-Z]/g, ''); // Remove non-alphabetic characters
+    }
+
+    if (input.id === 'field2' || input.id === 'field5') {
+      input.value = input.value.replace(/\D/g, ''); // Remove non-numeric characters
+    }
+
+    if (input.id === 'field4') {
+      input.value = input.value.replace(/\D/g, ''); // Remove non-numeric characters
+      if (Number(input.value) < 1 || Number(input.value) > 12) {
+        input.value = '';
+      }
+    }
+
+    if (input.value.length === input.maxLength) {
       const nextField = document.getElementById(nextFieldId);
       if (nextField) {
         nextField.focus();
@@ -199,13 +215,13 @@
     event.preventDefault();
     errorMessage = "";
 
-    if (!gender || !age || !userType || (userType === "student" && !studyProgram) || Object.values(deletionCodeStrings).some(value => value === "")) {
+    if (!gender || !age || !userType || (userType === "student" && !studyProgram) || (userType === "PhD student" && !phdStudyProgram) || Object.values(deletionCodeStrings).some(value => value === "")) {
       errorMessage = "Please fill out all fields.";
       return;
     }
 
     const deletionCode = Object.values(deletionCodeStrings).join("").toUpperCase();
-    const finalStudyProgram = userType === "student" ? studyProgram : userType;
+    const finalStudyProgram = userType === "student" ? studyProgram : phdStudyProgram;
 
     loading = true;
     try {
@@ -271,8 +287,8 @@
         type="number"
         bind:value={age}
         class="input input-bordered"
-        min="1"
-        max="120"
+        min="18"
+        max="100"
         required
       />
     </div>
@@ -307,6 +323,21 @@
       </div>
     {/if}
 
+    {#if userType === 'PhD student'}
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text">Area of research</span>
+        </label>
+        <input
+          type="text"
+          bind:value={phdStudyProgram}
+          class="input input-bordered"
+          maxlength="100"
+          autocomplete="off"
+        />
+      </div>
+    {/if}
+
     <div class="form-control">
       <label class="label">
         <span class="label-text">Deletion code</span>
@@ -321,6 +352,7 @@
           on:focus={() => showDescription(0)}
           on:input={(event) => handleInput(event, 'field2')}
           bind:value={deletionCodeStrings.field1}
+          autocomplete="off"
         />
         <input
           id="field2"
@@ -331,6 +363,8 @@
           on:focus={() => showDescription(1)}
           on:input={(event) => handleInput(event, 'field3')}
           bind:value={deletionCodeStrings.field2}
+          pattern="[0-9]*"
+          autocomplete="off"
         />
         <input
           id="field3"
@@ -341,6 +375,7 @@
           on:focus={() => showDescription(2)}
           on:input={(event) => handleInput(event, 'field4')}
           bind:value={deletionCodeStrings.field3}
+          autocomplete="off"
         />
         <input
           id="field4"
@@ -351,6 +386,8 @@
           on:focus={() => showDescription(3)}
           on:input={(event) => handleInput(event, 'field5')}
           bind:value={deletionCodeStrings.field4}
+          pattern="[0-9]*"
+          autocomplete="off"
         />
         <input
           id="field5"
@@ -359,8 +396,10 @@
           class="input w-20 input-bordered join-item"
           maxlength="1"
           on:focus={() => showDescription(4)}
-          on:input={(event) => handleInput(event, 'field6')}
+          on:input={(event) => handleInput(event, '')}
           bind:value={deletionCodeStrings.field5}
+          pattern="[0-9]*"
+          autocomplete="off"
         />
       </div>
       <div class="description mt-1 text-gray-400 text-s">{currentDescription}</div>

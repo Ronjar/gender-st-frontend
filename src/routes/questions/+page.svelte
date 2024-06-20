@@ -185,9 +185,9 @@
     const waitForNextQuestion = () => {
         return new Promise((resolve) => {
             if (narratedRef !== undefined && narratedRef.isShowing()) {
-                setTimeout(() => resolve(true), 5000);
+                setTimeout(() => resolve(true), 4000);
             } else {
-                setTimeout(() => resolve(true), 2000);
+                setTimeout(() => resolve(true), 1000);
             }
         });
     };
@@ -291,7 +291,7 @@
                         {#each sortedLeaderboard as player, index}
                             <tr
                                 class={player.isYou
-                                    ? "bg-base-300"
+                                    ? "bg-base-300 rounded-l"
                                     : "bg-base-200"}
                             >
                                 <td class="text-center text-lg">{index + 1}</td>

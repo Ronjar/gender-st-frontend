@@ -16,10 +16,9 @@
   import { BASE_URL } from "$lib/constants";
 
   let loading = false;
-  let apiResponse: number;
-  let buttonVisiblility = writable(false);
-  let uploadFinished = writable(false);
-  let round: number;
+  let round: number = get(wRound);  // Set initial value
+  let buttonVisibility = writable(false);
+
   wRound.subscribe((value) => {
     round = value;
   });
@@ -32,13 +31,6 @@
     const questions = get(wQuestions);
     const answerTime = get(wAnswerTime);
     const gamifiedElements = get(wGamifiedElements)[round];
-    round = get(wRound);
-    //const stai = [1,2,3,1,2,3];
-    //const ngse = [1,2,3,4,1,2,3,4];
-    //const sims = [1,2,3,4,1,2,3,4,1,2,3,4,1,2,3,4];
-    //const questions = [true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false];
-    //const answerTime = [1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000,];
-    //const gamifiedElements = "pblan";
 
     try {
       const response = await fetch(`${BASE_URL}/addset`, {
@@ -62,14 +54,12 @@
       }
 
       const data = await response.json();
-      uploadFinished.set(true);
-      if (data.round > 0 || data.round < 3) {
+      if (data.round > 0 && data.round < 3) {
         wRound.set(data.round);
-        buttonVisiblility.set(true);
+        buttonVisibility.set(true);
       }
     } catch (error) {
       console.error("Error uploading data:", error);
-      apiResponse = -1;
     }
   });
 
@@ -97,27 +87,21 @@
     You have completed round {round + 1} of the study. Thank you very much so far!
   </p>
   {/if}
-  {#if !$uploadFinished}
-    <p>Results are submitted any moment...</p>
+  {#if round >= 2}
+  <p>
+    Thank you for participating in this test. Please show this screen to the
+    supervising person.
+  </p>
   {/if}
-  {#if $uploadFinished}
-    <p>Results have been submitted.</p>
-    {#if round >= 2}
-      <p>
-        Thank you for participating in this test. Show this screen to the
-        supervising person
-      </p>
-    {/if}
-  {/if}
-  {#if $buttonVisiblility}
-    <p>To proceed in the study, please press the button below.</p>
-    <button
-      class="btn btn-primary mt-5 {loading ? 'loading' : ''}"
-      on:click={finishSurvey}
-      disabled={loading}
-    >
-      Next round
-    </button>
+  {#if $buttonVisibility}
+  <p>To proceed in the study, please press the button below.</p>
+  <button
+    class="btn btn-primary mt-5 {loading ? 'loading' : ''}"
+    on:click={finishSurvey}
+    disabled={loading}
+  >
+    Next round
+  </button>
   {/if}
 </div>
 
