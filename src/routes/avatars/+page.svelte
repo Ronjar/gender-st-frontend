@@ -17,7 +17,7 @@
     "/img/avatar/avatar12.png",
     "/img/avatar/avatar13.png",
     "/img/avatar/avatar14.png",
-    "/img/avatar/avatar15.png",
+    "/img/avatar/avatar15.png"
   ];
 
   const handleAvatarSelection = (avatar: string) => {
