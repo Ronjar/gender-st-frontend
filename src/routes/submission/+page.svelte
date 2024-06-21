@@ -16,7 +16,7 @@
   import { BASE_URL } from "$lib/constants";
 
   let loading = false;
-  let round: number = get(wRound);  // Set initial value
+  let round: number = get(wRound); // Set initial value
   let buttonVisibility = writable(true);
 
   wRound.subscribe((value) => {
@@ -54,9 +54,11 @@
       }
 
       const data = await response.json();
-      if (data.round > 0 && data.round < 3) {
+      if (data.round > 0) {
         wRound.set(data.round);
-        buttonVisibility.set(true);
+        if (data.round < 3) {
+          buttonVisibility.set(true);
+        }
       }
     } catch (error) {
       console.error("Error uploading data:", error);
@@ -75,25 +77,25 @@
 <div class="p-6 max-w-4xl mx-auto bg-base-200 rounded-xl shadow-md space-y-4">
   <h1>Thank you for your participation</h1>
   {#if round < 3}
-  <p>
-    You have completed round {round} of the study. Thank you very much so far!
-  </p>
+    <p>
+      You have completed round {round} of the study. Thank you very much so far!
+    </p>
   {/if}
   {#if round >= 3}
-  <p>
-    Thank you for participating in this test. Please show this screen to the
-    supervising person.
-  </p>
+    <p>
+      Thank you for participating in this test. Please show this screen to the
+      supervising person.
+    </p>
   {/if}
   {#if $buttonVisibility}
-  <p>To proceed in the study, please press the button below.</p>
-  <button
-    class="btn btn-primary mt-5 {loading ? 'loading' : ''}"
-    on:click={finishSurvey}
-    disabled={loading}
-  >
-    Next round
-  </button>
+    <p>To proceed in the study, please press the button below.</p>
+    <button
+      class="btn btn-primary mt-5 {loading ? 'loading' : ''}"
+      on:click={finishSurvey}
+      disabled={loading}
+    >
+      Next round
+    </button>
   {/if}
 </div>
 
