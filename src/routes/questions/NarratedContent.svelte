@@ -21,7 +21,7 @@
     }
 
     function getAvatar(){
-        return "/img/npc/avatar" + Math.floor(Math.random() * 9) + ".png";
+        return "/img/npc/avatar" + 1 + Math.floor(Math.random() * 8) + ".png";
     }
 
     export function hideNarration() {

@@ -17,7 +17,7 @@
 
   let loading = false;
   let round: number = get(wRound); // Set initial value
-  let buttonVisibility = writable(true);
+  let buttonVisibility = writable(false);
 
   wRound.subscribe((value) => {
     round = value;
