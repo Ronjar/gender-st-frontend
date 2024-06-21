@@ -64,7 +64,6 @@
   });
 
   const finishSurvey = async () => {
-    wRound.set(2);
     if (get(wIsAvatarEnabled)) {
       goto("/avatars");
     } else {

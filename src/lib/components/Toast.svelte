@@ -33,7 +33,7 @@
 <div class="mt-5 mx-auto">
   {#if visible}
     <div
-      class={`alert ${type === "success" ? "alert-success" : "alert-error"} shadow-lg`}
+      class={`alert alert-${type} shadow-lg`}
     >
       <div>
         <span>{message}</span>

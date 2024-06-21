@@ -22,7 +22,7 @@
   let showDeleteAllModal = false;
   let toastRef: Toast;
 
-  const hardcodedPassword = "enpro23"; // hardcoded password
+  const hardcodedPassword = "gender24"; // hardcoded password
 
   const fetchStats = async () => {
     loading = true;
@@ -72,25 +72,42 @@
     }
   };
 
-  const deleteDataset = async () => {
+  const downloadData = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/delete`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ code: deletionCode }),
-      });
-
-      const data = await response.json();
+      const response = await fetch(`${BASE_URL}/downloaddb`);
       if (response.ok) {
-        toastRef.showTypedToast("success", data.message || "Dataset deleted successfully.");
-        fetchStats();
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "data.db";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
       } else {
-        toastRef.showTypedToast("error", data.message || "Failed to delete dataset.");
+        toastRef.showTypedToast("error", "Failed to download DB.");
       }
     } catch (error) {
-      
+      toastRef.showTypedToast("warning", "An error occurred while downloading DB.");
+    }
+  };
+
+  const deleteDataset = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/removeuser/${deletionCode}`, {
+        method: "DELETE",
+      });
+
+      const data = await response.text();
+      if (response.ok) {
+        toastRef.showTypedToast("success", "User data deleted successfully.");
+        fetchStats();
+      } else if(response.status === 404) {
+        toastRef.showTypedToast("error", "User not found.");
+      } else {
+        toastRef.showTypedToast("error", data || "Failed to delete dataset.");
+      }
+    } catch (error) {
       toastRef.showTypedToast("warning", "An error occurred while deleting the dataset.");
     }
   };
@@ -98,28 +115,28 @@
   const handleBackup = async () => {
     try {
       const response = await fetch(`${BASE_URL}/backup`);
-      const data = await response.json();
+      const data = await response.text();
       if (response.ok) {
-        toastRef.showTypedToast("success", data.message || "Backup created successfully.");
+        toastRef.showTypedToast("success", data || "Backup created successfully.");
       } else {
-        toastRef.showTypedToast("error", data.message || "Failed to create backup.");
+        toastRef.showTypedToast("error", data || "Failed to create backup.");
       }
     } catch (error) {
+      console.log(error);
       toastRef.showTypedToast("warning", "An error occurred while creating the backup.");
     }
   };
 
   const handleDeleteAll = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/deleteAll`, {
-        method: "POST",
+      const response = await fetch(`${BASE_URL}/everything`, {
+        method: "DELETE",
       });
-      const data = await response.json();
+      const data = await response.text();
       if (response.ok) {
-        toastRef.showTypedToast("success", data.message || "All data deleted successfully.");
-        fetchStats();
+        toastRef.showTypedToast("success", data || "All data deleted successfully.");
       } else {
-        toastRef.showTypedToast("error", data.message || "Failed to delete all data.");
+        toastRef.showTypedToast("error", data || "Failed to delete all data.");
       }
       showDeleteAllModal = false;
     } catch (error) {
@@ -230,6 +247,9 @@
         >
         <button class="btn btn-primary mb-4" on:click={handleBackup}
           >Backup Data</button
+        >
+        <button class="btn btn-primary mb-4" on:click={downloadData}
+          >Download DB file</button
         >
       </div>
       <div class="card bg-base-300 p-6 mb-10">
