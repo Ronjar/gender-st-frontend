@@ -1,12 +1,22 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
-  import { onMount } from "svelte";
 
   export let type = "success"; // 'success' or 'error'
   export let message = "";
   export let visible = false;
 
   const dispatch = createEventDispatcher();
+
+  export function showTypedToast(messageType: string, msg: string, timeout: number = 2000){
+    type = messageType;
+    message = msg;
+    visible = true;
+
+    setTimeout(() => {
+      visible = false;
+      dispatch("dismiss");
+    }, timeout);
+  }
 
   export function showToast(isSuccess: boolean, msg: string) {
     type = isSuccess ? "success" : "error";

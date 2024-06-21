@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { writable, get, derived } from "svelte/store";
+    import { writable, get } from "svelte/store";
     import {
         questions as waQuestions,
         answerTime as waAnswerTime,
@@ -8,8 +8,6 @@
         isLeaderboardEnabled as waLeaderboard,
         isNarratedContentEnabled as waNarratedContent,
         areBadgesEnabled as waBadges,
-        avatarPath,
-        round,
         roundBasedPadding,
     } from "../../store";
     import Toast from "$lib/components/Toast.svelte";
@@ -21,7 +19,7 @@
         randomGoodPhrase,
     } from "$lib/scripts/narratedPhrases";
     import Badges from "./Badges.svelte";
-    import { getRandomLeaderboardNumber } from "$lib/scripts/leaderboardNumberGenerator";
+    import Leaderboard from "./Leaderboard.svelte";
 
     const totalQuestions = 20;
     let currentQuestionIndex = writable(0 + get(roundBasedPadding));
@@ -32,6 +30,7 @@
     let toastRef: Toast;
     let narratedRef: NarratedContent;
     let badgesRef: Badges;
+    let leaderboardRef: Leaderboard;
     let scoreModalRef: ScoreModal;
     let isUIEnabled = writable(true);
 
@@ -121,25 +120,6 @@
         "D",
     ];
 
-    // Function to get a random avatar
-    function getRandomAvatar(usedAvatars: Set<number>): string {
-        let avatarIndex;
-        do {
-            avatarIndex = 1 + Math.floor(Math.random() * 8); // Since we have avatar0 to avatar8
-        } while (usedAvatars.has(avatarIndex));
-        usedAvatars.add(avatarIndex);
-        return `/img/npc/avatar${avatarIndex}.png`;
-    }
-
-    let usedAvatars = new Set<number>();
-    let opponents = [
-        { score: getRandomLeaderboardNumber(16), profilePic: getRandomAvatar(usedAvatars), isYou: false },
-        { score: getRandomLeaderboardNumber(13), profilePic: getRandomAvatar(usedAvatars), isYou: false },
-        { score: getRandomLeaderboardNumber(10), profilePic: getRandomAvatar(usedAvatars), isYou: false },
-        { score: getRandomLeaderboardNumber(7), profilePic: getRandomAvatar(usedAvatars), isYou: false },
-        { score: getRandomLeaderboardNumber(4), profilePic: getRandomAvatar(usedAvatars), isYou: false },
-    ];
-
     function showToast(isSuccess: boolean) {
         const message = isSuccess ? "Correct answer!" : "Wrong answer!";
         toastRef.showToast(isSuccess, message);
@@ -206,6 +186,9 @@
     };
 
     score.subscribe((value) => {
+        if (leaderboardRef !== undefined){
+        leaderboardRef.updateUserScore(value);
+        }
         if (badgesRef !== undefined) {
             switch (value) {
                 case 1:
@@ -233,31 +216,16 @@
             if (areBadgesEnabled) {
                 scoreModalRef.setBadgeCount(badgesRef.unlockedBadgesCount());
             }
+            if(isLeaderboardEnabled){
             scoreModalRef.setLeaderboardPlace(
-                sortedLeaderboard.findIndex((player) => player.isYou) + 1,
+                leaderboardRef.getLeaderboardPlacement()
             );
+            }
             scoreModalRef.openModal();
             waAnswerTime.set(get(answerTime));
             waQuestions.set(get(userAnswers));
             areQuestionsFinished = true;
         }
-    });
-
-    const leaderboard = derived(score, ($score) => {
-        const players = [
-            ...opponents,
-            {
-                profilePic: get(avatarPath),
-                score: $score,
-                isYou: true,
-            },
-        ];
-        return players.sort((a, b) => b.score - a.score);
-    });
-
-    let sortedLeaderboard: any[] = [];
-    leaderboard.subscribe((value: any) => {
-        sortedLeaderboard = value;
     });
 
     function handleImageLoad() {
@@ -273,48 +241,7 @@
     <!-- Scoreboard -->
     <div class="w-1/4 mx-auto">
         {#if isLeaderboardEnabled}
-            <div class="bg-base-200 shadow-md rounded-xl p-6">
-                <span class="text-primary stat-value"><b>Leaderboard</b></span>
-                <table class="table w-full table-auto mt-10">
-                    <thead class="my-10">
-                        <tr class="my-10">
-                            <th class="w-1/4">Rank</th>
-                            {#if isAvatarEnabled}<th class="w-1/4">Profile</th>
-                            {/if}
-                            {#if arePointsEnabled}<th class="w-2/4 text-center"
-                                    >Score</th
-                                >
-                            {/if}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {#each sortedLeaderboard as player, index}
-                            <tr
-                                class={player.isYou
-                                    ? "bg-base-300 rounded-l"
-                                    : "bg-base-200"}
-                            >
-                                <td class="text-center text-lg">{index + 1}</td>
-                                {#if isAvatarEnabled}
-                                    <td
-                                        class="flex justify-center items-center"
-                                    >
-                                        <img
-                                            src={player.profilePic}
-                                            alt="profile"
-                                            class="w-20 h-20 rounded-full"
-                                        />
-                                    </td>
-                                {/if}
-                                {#if arePointsEnabled}<td
-                                        class="text-center text-lg"
-                                        >{player.score}</td
-                                    >{/if}
-                            </tr>
-                        {/each}
-                    </tbody>
-                </table>
-            </div>
+            <Leaderboard bind:this={leaderboardRef}/>
         {/if}
     </div>
     <!-- Question Board -->
@@ -373,7 +300,7 @@
                     <div class="mx-auto">
                         <h2>
                             Thank you for completing this round of logic
-                            puzzles!<br> Now, we have some questions for you. To
+                            puzzles!<br /> Now, we have some questions for you. To
                             proceed, please press the button below.
                         </h2>
                         <a class="btn btn-primary mt-10 w-full" href="/stai">

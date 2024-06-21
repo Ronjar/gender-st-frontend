@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { writable } from "svelte/store";
   import { BASE_URL } from "$lib/constants";
+  import Toast from "$lib/components/Toast.svelte";
 
   let usersCount = 0;
   let datasetCounts = {
@@ -15,10 +15,12 @@
     pblan: 0,
   };
 
-  let errorMessage = "";
   let loading = false;
   let isAuthenticated = false;
   let password = "";
+  let deletionCode = "";
+  let showDeleteAllModal = false;
+  let toastRef: Toast;
 
   const hardcodedPassword = "enpro23"; // hardcoded password
 
@@ -41,12 +43,87 @@
           pblan: data.dataSets.pblan,
         };
       } else {
-        errorMessage = data.message || "An error occurred. Please try again.";
+        toastRef.showTypedToast("error", data.message || "Fetching stats failed.");
       }
     } catch (error) {
-      errorMessage = "An error occurred. Please try again.";
+      toastRef.showTypedToast("error", "An error occurred. Is your database running / are you connected to network?");
     } finally {
       loading = false;
+    }
+  };
+
+  const downloadCSV = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/csv`);
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "data.csv";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } else {
+        toastRef.showTypedToast("error", "Failed to download CSV.");
+      }
+    } catch (error) {
+      toastRef.showTypedToast("warning", "An error occurred while downloading CSV.");
+    }
+  };
+
+  const deleteDataset = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/delete`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ code: deletionCode }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        toastRef.showTypedToast("success", data.message || "Dataset deleted successfully.");
+        fetchStats();
+      } else {
+        toastRef.showTypedToast("error", data.message || "Failed to delete dataset.");
+      }
+    } catch (error) {
+      
+      toastRef.showTypedToast("warning", "An error occurred while deleting the dataset.");
+    }
+  };
+
+  const handleBackup = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/backup`);
+      const data = await response.json();
+      if (response.ok) {
+        toastRef.showTypedToast("success", data.message || "Backup created successfully.");
+      } else {
+        toastRef.showTypedToast("error", data.message || "Failed to create backup.");
+      }
+    } catch (error) {
+      toastRef.showTypedToast("warning", "An error occurred while creating the backup.");
+    }
+  };
+
+  const handleDeleteAll = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/deleteAll`, {
+        method: "POST",
+      });
+      const data = await response.json();
+      if (response.ok) {
+        toastRef.showTypedToast("success", data.message || "All data deleted successfully.");
+        fetchStats();
+      } else {
+        toastRef.showTypedToast("error", data.message || "Failed to delete all data.");
+      }
+      showDeleteAllModal = false;
+    } catch (error) {
+      toastRef.showTypedToast("warning", "An error occurred while deleting all data.");
     }
   };
 
@@ -61,7 +138,7 @@
       isAuthenticated = true;
       fetchStats();
     } else {
-      errorMessage = "Incorrect password. Please try again.";
+      toastRef.showTypedToast("error", "Incorrect password. Please try again.");
     }
   };
 
@@ -69,9 +146,13 @@
     return Object.values(datasetCounts).reduce((a, b) => a + b, 0);
   };
 </script>
-
+<div class="fixed top-0 left-1/3 w-1/3 h-10">
+<Toast bind:this={toastRef} />
+</div>
 {#if !isAuthenticated}
-  <div class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+  <div
+    class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50"
+  >
     <div class="modal modal-open">
       <div class="modal-box">
         <h3 class="font-bold text-lg">Admin Login</h3>
@@ -83,11 +164,6 @@
             placeholder="Enter password"
           />
         </div>
-        {#if errorMessage}
-          <div class="alert alert-error">
-            <div>{errorMessage}</div>
-          </div>
-        {/if}
         <div class="modal-action">
           <button class="btn btn-primary" on:click={handleLogin}>Login</button>
         </div>
@@ -100,7 +176,8 @@
     {#if loading}
       <div class="loading loading-spinner"></div>
     {:else}
-      <div class="mb-10 flex flex-col">
+      <div class="card bg-base-300 p-6 mb-10">
+        <h2 class="text-xl font-bold mb-4">Statistics</h2>
         <div class="stats bg-primary text-primary-content mb-10">
           <div class="stat">
             <div class="stat-title text-primary-content">Total Users</div>
@@ -140,13 +217,63 @@
             <div class="stat-title">PBLAN</div>
             <div class="stat-value">{datasetCounts.pblan}</div>
           </div>
-          <div class="stat bg-base-300">
+          <div class="stat bg-base-200">
             <div class="stat-title">Total</div>
             <div class="stat-value text-secondary">{totalDatasets()}</div>
           </div>
         </div>
       </div>
+      <div class="card bg-base-300 p-6 mb-10">
+        <h2 class="text-xl font-bold mb-4">Backup</h2>
+        <button class="btn btn-primary mb-4" on:click={downloadCSV}
+          >Download CSV</button
+        >
+        <button class="btn btn-primary mb-4" on:click={handleBackup}
+          >Backup Data</button
+        >
+      </div>
+      <div class="card bg-base-300 p-6 mb-10">
+        <h2 class="text-xl font-bold mb-4">Data Deletion</h2>
+        <div class="join mb-4">
+        <input
+          type="text"
+          bind:value={deletionCode}
+          class="input input-bordered w-full join-item "
+          placeholder="Enter deletion code"
+        />
+        <button class="btn btn-error join-item" on:click={deleteDataset}
+          >Delete Dataset</button
+        >
+      </div>
+        <button
+          class="btn btn-error"
+          on:click={() => (showDeleteAllModal = true)}>Delete All Data</button
+        >
+      </div>
     {/if}
+  </div>
+{/if}
+
+{#if showDeleteAllModal}
+  <div
+    class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50"
+  >
+    <div class="modal modal-open">
+      <div class="modal-box">
+        <h3 class="font-bold text-lg">Are you sure?</h3>
+        <p>
+          This action will delete all data permanently. This cannot be undone.
+        </p>
+        <div class="modal-action">
+          <button class="btn" on:click={() => (showDeleteAllModal = false)}
+            >Cancel</button
+          >
+          <button class="btn btn-error" on:click={handleDeleteAll}
+            >Delete All</button
+          >
+        </div>
+      </div>
+    </div>
   </div>
 {/if}
 

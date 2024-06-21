@@ -17,7 +17,7 @@
 
   let loading = false;
   let round: number = get(wRound);  // Set initial value
-  let buttonVisibility = writable(false);
+  let buttonVisibility = writable(true);
 
   wRound.subscribe((value) => {
     round = value;
@@ -63,15 +63,8 @@
     }
   });
 
-  function getTitle() {
-    if (round < 2) {
-      return `End of study part ${round + 1}`;
-    } else {
-      return "End of study, thank you for your participation";
-    }
-  }
-
   const finishSurvey = async () => {
+    wRound.set(2);
     if (get(wIsAvatarEnabled)) {
       goto("/avatars");
     } else {
@@ -81,13 +74,13 @@
 </script>
 
 <div class="p-6 max-w-4xl mx-auto bg-base-200 rounded-xl shadow-md space-y-4">
-  <h1>{getTitle()}</h1>
-  {#if round < 2}
+  <h1>Thank you for your participation</h1>
+  {#if round < 3}
   <p>
-    You have completed round {round + 1} of the study. Thank you very much so far!
+    You have completed round {round} of the study. Thank you very much so far!
   </p>
   {/if}
-  {#if round >= 2}
+  {#if round >= 3}
   <p>
     Thank you for participating in this test. Please show this screen to the
     supervising person.

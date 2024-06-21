@@ -187,7 +187,7 @@
     const input = event.target;
 
     if (input.id === 'field1' || input.id === 'field3') {
-      input.value = input.value.replace(/[^a-zA-Z]/g, ''); // Remove non-alphabetic characters
+      input.value = input.value.replace(/[^a-zA-Z]/g, '').toUpperCase(); // Remove non-alphabetic characters
     }
 
     if (input.id === 'field2' || input.id === 'field5') {
