@@ -32,7 +32,7 @@
     const questions = get(wQuestions);
     const answerTime = get(wAnswerTime);
     let gamifiedElements = "";
-    if(round < 3){
+    if (round < 3) {
       gamifiedElements = get(wGamifiedElements)[round];
     }
 
@@ -85,8 +85,7 @@
     <p>
       You have completed round {round} of the study. Thank you very much so far!
     </p>
-  {/if}
-  {#if round >= 3}
+  {:else}
     <p>
       Thank you for participating in this test. Please show this screen to the
       supervising person.
