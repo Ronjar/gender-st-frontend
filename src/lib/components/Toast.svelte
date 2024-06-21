@@ -9,7 +9,7 @@
   const dispatch = createEventDispatcher();
 
   // Reactive statement to update alertType based on type
-  $: alertType = type === "success" ? "alert-success" : "alert-error";
+  $: alertType = `alert-${type}`;
 
   export function showTypedToast(messageType: string, msg: string, timeout: number = 2000){
     type = messageType;
