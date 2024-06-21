@@ -2,10 +2,13 @@
     import "../app.css";
     import unsaveddialog from "$lib/scripts/unsaveddialog";
     import { onMount } from "svelte";
+    import { VERSION } from "$lib/constants";
     const { action } = unsaveddialog();
     import { avatarPath as storeAvatarPath } from "../store";
 
     export const ssr = false;
+
+    console.log("Version:" + VERSION);
 
     let avatarEnabled = false;
     let avatarPath = "";

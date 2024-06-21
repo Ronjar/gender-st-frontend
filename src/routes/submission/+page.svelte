@@ -19,6 +19,7 @@
   let loading = false;
   let round: number = get(wRound); // Set initial value
   let buttonVisibility = writable(false);
+  let endVisibility = writable(false);
 
   wRound.subscribe((value) => {
     round = value;
@@ -59,10 +60,12 @@
       const data = await response.json();
       console.log(data);
       if (data.round > 0) {
-        wRound.set(data.round);
         if (data.round < 3) {
           wAvatarPath.set("");
+          wRound.set(data.round);
           buttonVisibility.set(true);
+        } else {
+          endVisibility.set(true);
         }
       }
     } catch (error) {
@@ -81,15 +84,16 @@
 
 <div class="p-6 max-w-4xl mx-auto bg-base-200 rounded-xl shadow-md space-y-4">
   <h1>Thank you for your participation</h1>
+  {#if !$endVisibility}
   {#if round < 3}
     <p>
       You have completed round {round} of the study. Thank you very much so far!
     </p>
+  {/if}
   {:else}
-    <p>
-      Thank you for participating in this test. Please show this screen to the
-      supervising person.
-    </p>
+  <div role="alert" class="alert alert-success">
+    <span>Thank you for participating in this test. Please show this screen to thesupervising person.</span>
+  </div>
   {/if}
   {#if $buttonVisibility}
     <p>To proceed in the study, please press the button below.</p>
