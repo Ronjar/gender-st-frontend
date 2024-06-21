@@ -9,6 +9,7 @@
     round as wRound,
     gamifiedElements as wGamifiedElements,
     isAvatarEnabled as wIsAvatarEnabled,
+    avatarPath as wAvatarPath,
     userId as wUserId,
   } from "../../store";
   import { writable, get } from "svelte/store";
@@ -30,7 +31,10 @@
     const sims = get(wSims);
     const questions = get(wQuestions);
     const answerTime = get(wAnswerTime);
-    const gamifiedElements = get(wGamifiedElements)[round];
+    let gamifiedElements = "";
+    if(round < 3){
+      gamifiedElements = get(wGamifiedElements)[round];
+    }
 
     try {
       const response = await fetch(`${BASE_URL}/addset`, {
@@ -57,6 +61,7 @@
       if (data.round > 0) {
         wRound.set(data.round);
         if (data.round < 3) {
+          wAvatarPath.set("");
           buttonVisibility.set(true);
         }
       }
