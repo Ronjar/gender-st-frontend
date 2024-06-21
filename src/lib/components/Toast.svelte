@@ -4,8 +4,12 @@
   export let type = "success"; // 'success' or 'error'
   export let message = "";
   export let visible = false;
+  export let alertType = "alert-success";
 
   const dispatch = createEventDispatcher();
+
+  // Reactive statement to update alertType based on type
+  $: alertType = type === "success" ? "alert-success" : "alert-error";
 
   export function showTypedToast(messageType: string, msg: string, timeout: number = 2000){
     type = messageType;
@@ -32,9 +36,7 @@
 
 <div class="mt-5 mx-auto">
   {#if visible}
-    <div
-      class={`alert alert-${type} shadow-lg`}
-    >
+    <div class={`alert ${alertType} shadow-lg`}>
       <div>
         <span>{message}</span>
       </div>
