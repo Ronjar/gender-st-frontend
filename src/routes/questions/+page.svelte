@@ -136,21 +136,17 @@
             userAnswers.update((answers) => [...answers, true]);
             showToast(true);
             if (narratedRef !== undefined) {
-                callWithProbability(
-                    0.2,
-                    narratedRef.showNarration,
-                    randomGoodPhrase(),
-                );
+                if (get(currentQuestionIndex) % 3 === 0) {
+                    narratedRef.showNarration(randomGoodPhrase());
+                }
             }
         } else {
             userAnswers.update((answers) => [...answers, false]);
             showToast(false);
             if (narratedRef !== undefined) {
-                callWithProbability(
-                    0.2,
-                    narratedRef.showNarration,
-                    randomBadPhrase(),
-                );
+                if (get(currentQuestionIndex) % 3 === 0) {
+                    narratedRef.showNarration(randomBadPhrase());
+                }
             }
         }
         await preloadNextQuestionImage();
