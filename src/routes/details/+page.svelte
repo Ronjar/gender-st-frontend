@@ -7,6 +7,7 @@
   import { goto } from "$app/navigation";
   import { get } from "svelte/store";
   import { BASE_URL } from "$lib/constants";
+    import HoverTranslate from "$lib/components/HoverTranslate.svelte";
 
   let gender = "";
   let age = "";
@@ -339,8 +340,9 @@
     {/if}
 
     <div class="form-control">
+      <!-- svelte-ignore a11y-label-has-associated-control -->
       <label class="label">
-        <span class="label-text">Deletion code</span>
+        <span class="label-text"><HoverTranslate word="st_details_deletion_code"/></span>
       </label>
       <div class="join">
         <input
